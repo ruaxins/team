@@ -5,135 +5,83 @@ using System.Collections.Generic;
 public class cardsee : MonoBehaviour
 {
     [Header("卡牌设置")]
+    admin adminScript;
     public List<card> cards = new List<card>(); // 卡牌数据列表
     public Vector2 cardSize = new Vector2(200, 300); // 卡牌尺寸
 
     [Header("布局设置")]
-    public float cardSpacing = 150f; // 卡牌间距
-    public float maxRotation = 15f; // 最大旋转角度
+    public float radius = 200f;      // 扇形半径
+    public float maxAngle = 60f;     // 扇形总角度
 
     [Header("悬停效果")]
     public float hoverHeight = 80f; // 悬停抬升高度
     public float hoverScale = 1.2f; // 悬停缩放比例
 
+    [Header("动画设置")]
+    public float positionLerpSpeed = 12f;
+    public float rotationLerpSpeed = 10f;
+
+    private List<GameObject> cardObjects = new List<GameObject>(); // 卡牌实例列表
     private Canvas canvas;
 
-    [SerializeField]
-    private List<GameObject> cardObjects = new List<GameObject>(); // 卡牌实例列表
-
-    private int hoverIndex = -1;
+    public Transform foldc;
 
     void Start()
     {
-        // 获取Canvas引用
+        adminScript = GetComponent<admin>();
         canvas = GetComponentInParent<Canvas>();
-        if (canvas == null)
-        {
-            Debug.LogError("未找到Canvas！请确保cardsee挂载在Canvas的子物体上。");
-            return;
-        }
-
-        // 初始化卡牌
         InitializeCards();
     }
 
-    void Update()
+    public void InitializeCards()
     {
-        UpdateHoverState();
-        UpdateLayout();
-    }
-
-    // 初始化卡牌
-    void InitializeCards()
-    {
+        cards = adminScript.cards;
         // 清空旧卡牌
-        foreach (var cardObj in cardObjects)
-        {
-            if (cardObj != null)
-                Destroy(cardObj);
-        }
+        foreach (var obj in cardObjects) Destroy(obj);
         cardObjects.Clear();
 
-        // 创建新卡牌
         for (int i = 0; i < cards.Count; i++)
         {
-            GameObject cardObj = new GameObject($"Card_{i}");
+            GameObject cardObj = new GameObject($"Card_{i}", typeof(Image), typeof(card2));
             cardObj.transform.SetParent(transform);
 
-            // 添加UI组件
-            Image img = cardObj.AddComponent<Image>();
-            img.sprite = cards[i].cardFront; // 仅设置卡面图片
+            // 设置卡牌图片
+            Image img = cardObj.GetComponent<Image>();
+            img.sprite = cards[i].cardFront;
+            img.raycastTarget = true;
 
-            // 设置RectTransform
+            // 设置卡牌尺寸
             RectTransform rt = cardObj.GetComponent<RectTransform>();
             rt.sizeDelta = cardSize;
-            rt.pivot = new Vector2(0.5f, 0f); // 轴心点底部中心
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0f); // 锚点屏幕底部中心
+            rt.pivot = rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            cardObj.GetComponent<card2>().controller= cards[i].GetComponent<card>();
 
-            // 添加到列表
+            // 初始化控制器
+            var controller = cardObj.GetComponent<card2>();
+            controller.Initialize(this, i);
+            cards[i].controller = controller;
+
             cardObjects.Add(cardObj);
         }
-    }
-
-    // 更新悬停状态
-    void UpdateHoverState()
-    {
-        if (cardObjects == null || cardObjects.Count == 0) return;
-
-        Vector2 mousePos = Input.mousePosition;
-        hoverIndex = -1;
-
         for (int i = 0; i < cardObjects.Count; i++)
         {
-            if (cardObjects[i] == null) continue;
+            var controller = cards[i].controller;
+            if (controller.IsDragging) continue;
 
-            RectTransform rt = cardObjects[i].GetComponent<RectTransform>();
-            if (rt != null &&
-                RectTransformUtility.RectangleContainsScreenPoint(rt, mousePos))
-            {
-                hoverIndex = i;
-                break;
-            }
-        }
-    }
+            // 计算角度（从左侧到右侧均匀分布）
+            float angle = -maxAngle / 2f;
+            if (cardObjects.Count > 1)
+                angle += (i / (float)(cardObjects.Count - 1)) * maxAngle;
 
-    // 更新卡牌布局
-    void UpdateLayout()
-    {
-        if (cardObjects == null || cardObjects.Count == 0) return;
+            // 计算位置（极坐标转笛卡尔）
+            float radian = angle * Mathf.Deg2Rad;
+            float x = radius * Mathf.Sin(radian);
+            float y = radius * Mathf.Cos(radian); // 圆心位于 (0, -radius)
 
-        // 计算布局参数
-        float totalWidth = (cardObjects.Count - 1) * cardSpacing;
-        Vector2 startPos = new Vector2(-totalWidth / 2, 50f); // 底部居中基准点
+            // 计算旋转（卡牌朝向圆心）
+            float targetRot = -angle; // 旋转角度与角度相反
 
-        for (int i = 0; i < cardObjects.Count; i++)
-        {
-            RectTransform rt = cardObjects[i].GetComponent<RectTransform>();
-            if (rt == null) continue;
-
-            bool isHovered = i == hoverIndex;
-
-            // 计算水平偏移
-            float xPos = startPos.x + i * cardSpacing;
-
-            // 计算旋转角度
-            float rotation = -Mathf.Lerp(
-                -maxRotation,
-                maxRotation,
-                cardObjects.Count > 1 ? (float)i / (cardObjects.Count - 1) : 0.5f
-            );
-
-            // 悬停效果
-            float yOffset = isHovered ? hoverHeight : 0;
-            float scale = isHovered ? hoverScale : 1f;
-
-            // 计算目标位置
-            Vector2 targetPos = new Vector2(xPos, startPos.y + yOffset);
-
-            // 应用变换
-            rt.anchoredPosition = Vector2.Lerp(rt.anchoredPosition, targetPos, Time.deltaTime * 12f);
-            rt.localRotation = Quaternion.Slerp(rt.localRotation, Quaternion.Euler(0, 0, rotation), Time.deltaTime * 10f);
-            rt.localScale = Vector3.Lerp(rt.localScale, Vector3.one * scale, Time.deltaTime * 10f);
+            controller.SetTarget(new Vector2(x, y), targetRot, Vector3.one);
         }
     }
 }
