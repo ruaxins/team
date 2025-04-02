@@ -23,8 +23,8 @@ public class card2 : MonoBehaviour,
     private Vector2 targetPosition;
     private float targetRotation;
     private Vector3 targetScale = Vector3.one;
+    private bool IsChoiced2;
 
-    private bool isLifted = false;
     private Vector2 originalPosition;
 
     public void Initialize(cardsee manager, int index)
@@ -36,7 +36,6 @@ public class card2 : MonoBehaviour,
     public void SetTarget(Vector2 position, float rotation, Vector3 scale)
     {
         originalPosition = position;
-        isLifted = false;
         targetPosition = position;
         targetRotation = rotation;
         targetScale = scale;
@@ -49,7 +48,6 @@ public class card2 : MonoBehaviour,
         if (Input.GetMouseButtonUp(0))
         {
             IsDragging = false;
-            isLifted = false;
             IsChoiced = false;
         }
         if (IsFolded)
@@ -60,7 +58,7 @@ public class card2 : MonoBehaviour,
                 Time.deltaTime * manager.positionLerpSpeed);
             return;
         }
-        if (IsDragging && IsChoiced)
+        if (IsDragging && (IsChoiced || IsChoiced2))
         {
             Vector2 mousePos = Input.mousePosition;
 
@@ -85,6 +83,7 @@ public class card2 : MonoBehaviour,
             rt.localRotation = Quaternion.Slerp(rt.localRotation,
             Quaternion.Euler(0, 0, 0),
             Time.deltaTime * manager.rotationLerpSpeed);
+            rt.localScale = Vector3.Lerp(rt.localScale, Vector3.one, Time.deltaTime * 10f);
             return;
         }
 
@@ -95,18 +94,20 @@ public class card2 : MonoBehaviour,
             Time.deltaTime * manager.rotationLerpSpeed);
         rt.localScale = Vector3.Lerp(rt.localScale, targetScale, Time.deltaTime * 10f);
 
-        targetPosition = originalPosition + (isLifted ? new Vector2(0, hoverHeight) : Vector2.zero);
+        targetPosition = originalPosition + (IsChoiced ? new Vector2(0, hoverHeight) : Vector2.zero);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         IsHovered = true;
+        if(!IsDragging)IsChoiced2 = true;
         targetScale = Vector3.one * hoverScale;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         IsHovered = false;
+        if (!IsDragging) IsChoiced2 = false;
         targetScale = Vector3.one;
     }
 
@@ -114,8 +115,7 @@ public class card2 : MonoBehaviour,
     {
         if (eventData.button == PointerEventData.InputButton.Right && !IsDragging)
         {
-            isLifted = !isLifted;
-            IsChoiced=true;
+            IsChoiced=!IsChoiced;
         }
     }
 
@@ -125,7 +125,6 @@ public class card2 : MonoBehaviour,
     private void OnLeftMousepUp()
     {
         IsDragging = false;
-        isLifted = false;
     }
 
     public Transform foldc;

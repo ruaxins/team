@@ -6,8 +6,8 @@ public class cardsee : MonoBehaviour
 {
     [Header("卡牌设置")]
     admin adminScript;
-    public List<card> cards = new List<card>(); // 卡牌数据列表
-    public Vector2 cardSize = new Vector2(200, 300); // 卡牌尺寸
+    public List<card> hand_in_card_list = new List<card>(); // 卡牌数据列表
+    public Vector2 hand_in_card_listize = new Vector2(200, 300); // 卡牌尺寸
 
     [Header("布局设置")]
     public float radius = 200f;      // 扇形半径
@@ -30,42 +30,42 @@ public class cardsee : MonoBehaviour
     {
         adminScript = GetComponent<admin>();
         canvas = GetComponentInParent<Canvas>();
-        InitializeCards();
+        Initializehand_in_card_list();
     }
 
-    public void InitializeCards()
+    public void Initializehand_in_card_list()
     {
-        cards = adminScript.cards;
+        hand_in_card_list = adminScript.hand_in_card_list;
         // 清空旧卡牌
         foreach (var obj in cardObjects) Destroy(obj);
         cardObjects.Clear();
 
-        for (int i = 0; i < cards.Count; i++)
+        for (int i = 0; i < hand_in_card_list.Count; i++)
         {
             GameObject cardObj = new GameObject($"Card_{i}", typeof(Image), typeof(card2));
             cardObj.transform.SetParent(transform);
 
             // 设置卡牌图片
             Image img = cardObj.GetComponent<Image>();
-            img.sprite = cards[i].cardFront;
+            img.sprite = hand_in_card_list[i].cardFront;
             img.raycastTarget = true;
 
             // 设置卡牌尺寸
             RectTransform rt = cardObj.GetComponent<RectTransform>();
-            rt.sizeDelta = cardSize;
+            rt.sizeDelta = hand_in_card_listize;
             rt.pivot = rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-            cardObj.GetComponent<card2>().controller= cards[i].GetComponent<card>();
+            cardObj.GetComponent<card2>().controller= hand_in_card_list[i].GetComponent<card>();
 
             // 初始化控制器
             var controller = cardObj.GetComponent<card2>();
             controller.Initialize(this, i);
-            cards[i].controller = controller;
+            hand_in_card_list[i].controller = controller;
 
             cardObjects.Add(cardObj);
         }
         for (int i = 0; i < cardObjects.Count; i++)
         {
-            var controller = cards[i].controller;
+            var controller = hand_in_card_list[i].controller;
             if (controller.IsDragging) continue;
 
             // 计算角度（从左侧到右侧均匀分布）

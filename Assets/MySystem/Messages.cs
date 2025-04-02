@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
-public class admin : MonoBehaviour
+public class Messages : MonoBehaviour
 {
-    public List<card> temp = new List<card>();//临时牌库
-    public List<card> bank = new List<card>();//图鉴
-    public List<card> equipment_bar = new List<card>();//装备栏
-
-    public List<card> bank_in_cards = new List<card>();//牌库
-    public List<card> bank_out_cards = new List<card>();//弃牌堆
-    public List<card> hand_in_card_list = new List<card>();//手牌
-
-    public List<card> hand_out_card_list = new List<card>();//出牌列表
+}
+public class Message
+{
+    //游戏内全局变量
+    public List<Card> temp = new List<Card>();//临时牌库
+    public List<Card> bank = new List<Card>();//图鉴
+    public List<Card> equipment_bar = new List<Card>();//装备栏
+    public List<Card> bank_in_cards = new List<Card>();//牌库
+    public List<Card> bank_out_cards = new List<Card>();//弃牌堆
+    public List<Card> hand_in_card_list = new List<Card>();//手牌
+    public List<Card> hand_out_card_list = new List<Card>();//出牌列表
     public List<string> round_end_action = new List<string>();//结束行动列表
     public List<Enemy> enemy_bank = new List<Enemy>();//怪物池
     public List<Enemy> enemy_fight = new List<Enemy>();//战斗中的怪物
@@ -41,17 +44,20 @@ public class admin : MonoBehaviour
     public bool ClubJ { get => clubJ; set => clubJ = value; }
 
     //当前选择的卡牌
-    public int card_choose = 0;
+    int card_choose = 0;
     public int Card_choose { get => card_choose; set => card_choose = value; }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    public static Message message;
+    private Message() { }
+    public static Message Msg
     {
-        
+        get
+        {
+            if (message == null)
+            {
+                message = new Message();
+            }
+            return message;
+        }
     }
 }
