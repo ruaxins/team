@@ -39,6 +39,13 @@ public class Message
     int maxround = 3;
     public int MaxRound { get => maxround; set => maxround = value; }
 
+    //弃牌次数
+    int drop = 3;
+    public int Drop { get => drop; set => drop = value; }
+    //最大弃牌次数
+    int maxdrop = 3;
+    public int MaxDrop { get => maxdrop; set => maxdrop = value; }
+
     //clubJ
     bool clubJ = false;
     public bool ClubJ { get => clubJ; set => clubJ = value; }
