@@ -344,8 +344,6 @@ public class Combat_System : MonoBehaviour
             manager.Data_clear_card();
             //重置回合数
             Message.Msg.Round = 1;
-            //重置弃牌次数
-            Message.Msg.Drop = Message.Msg.MaxDrop;
             //判断是否调用club
             if (manager.Search_equipment("club3")) clubEvent3.Invoke(player, enemy);
             if (manager.Search_equipment("club4")) clubEvent4.Invoke(player, enemy);
@@ -444,7 +442,6 @@ public class Combat_System : MonoBehaviour
     //弃牌_Drop
     public void Drop_card()
     {
-        if (Message.Msg.Drop <= 0) return;
         foreach (Card c in Message.Msg.hand_out_card_list)
         {
             c.isused = true;
@@ -452,16 +449,6 @@ public class Combat_System : MonoBehaviour
             Message.Msg.bank_out_cards.Add(c);
         }
         Message.Msg.hand_out_card_list.Clear();
-        //从牌库补充卡牌至上限
-        if (Message.Msg.hand_in_card_list.Count < Message.Msg.Hand_in_card_num_max)
-            for (int i = Message.Msg.hand_in_card_list.Count; i < Message.Msg.Hand_in_card_num_max; i++)
-            {
-                if (Message.Msg.bank_in_cards.Count <= 0) break;
-                manager.Get_card();
-                if (manager.Search_equipment("club10")) clubEvent10.Invoke(player, enemy);
-                //创建实例
-            }
-        Message.Msg.Drop--;
     }
     //打出手牌
     public void Use_card(Player player, Enemy enemy)
