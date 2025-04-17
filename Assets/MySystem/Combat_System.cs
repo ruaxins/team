@@ -3,52 +3,82 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Combat_System : MonoBehaviour
 {
+    [SerializeField] private GameObject hand_in_list;
+    [SerializeField] private GameObject hand_out_list;
+    [SerializeField] private GameObject equipment_list;
+    [SerializeField] private GameObject enemy_list;
+    List<Vector2> potision = new List<Vector2>
+    {
+        new Vector2(-600, 0),
+        new Vector2(-500, 0),
+        new Vector2(-400, 0),
+        new Vector2(-300, 0),
+        new Vector2(-200, 0),
+        new Vector2(-100, 0),
+        new Vector2(0, 0),
+        new Vector2(100, 0),
+        new Vector2(200, 0),
+        new Vector2(300, 0),
+        new Vector2(400, 0),
+        new Vector2(500, 0),
+        new Vector2(600, 0),
+        new Vector2(700, 0),
+        new Vector2(800, 0),
+        new Vector2(900, 0),
+    };
+    List<Vector2> potisions = new List<Vector2>
+    {
+        new Vector2(0, 300),
+        new Vector2(0, 200),
+        new Vector2(0, 100),
+        new Vector2(0, 0),
+        new Vector2(0, -100),
+        new Vector2(0, -200),
+        new Vector2(0, -300),
+        new Vector2(0, -400),
+        new Vector2(0, -500),
+        new Vector2(0, -600),
+        new Vector2(0, -700),
+        new Vector2(0, -800),
+        new Vector2(0, -900),
+    };
+    List<Vector2> potision_e = new List<Vector2>
+    {
+        new Vector2(-500, 0),
+        new Vector2(-300, 0),
+        new Vector2(-100, 0),
+        new Vector2(100, 0),
+        new Vector2(300, 0),
+    };
     #region 初始化组件
-    public UnityEvent<Player, Enemy> clubEvent3;
-    public UnityEvent<Player, Enemy> clubEvent4;
-    public UnityEvent<Player, Enemy> clubEvent5;
-    public UnityEvent<Player, Enemy> clubEvent6;
-    public UnityEvent<Player, Enemy> clubEvent7;
-    public UnityEvent<Player, Enemy> clubEvent8;
-    public UnityEvent<Player, Enemy> clubEvent9;
-    public UnityEvent<Player, Enemy> clubEvent10;
-    public UnityEvent<Player, Enemy> clubEventJ;
-    public UnityEvent<Player, Enemy> clubEventQ;
-    public UnityEvent<Player, Enemy> clubEventK;
-    public UnityEvent<Player, Enemy> clubEventA;
-    public UnityEvent<Player, Enemy> curseEvent1;
-    public UnityEvent<Player, Enemy> curseEvent2;
-    public UnityEvent<Player, Enemy> curseEvent3;
-    public UnityEvent<Player, Enemy> curseEvent4;
-    public UnityEvent<Player, Enemy> curseEvent5;
+    UnityEvent<Player, Enemy> clubEvent3;
+    UnityEvent<Player, Enemy> clubEvent4;
+    UnityEvent<Player, Enemy> clubEvent5;
+    UnityEvent<Player, Enemy> clubEvent6;
+    UnityEvent<Player, Enemy> clubEvent7;
+    UnityEvent<Player, Enemy> clubEvent8;
+    UnityEvent<Player, Enemy> clubEvent9;
+    UnityEvent<Player, Enemy> clubEvent10;
+    UnityEvent<Player, Enemy> clubEventJ;
+    UnityEvent<Player, Enemy> clubEventQ;
+    UnityEvent<Player, Enemy> clubEventK;
+    UnityEvent<Player, Enemy> clubEventA;
+    UnityEvent<Player, Enemy> curseEvent1;
+    UnityEvent<Player, Enemy> curseEvent2;
+    UnityEvent<Player, Enemy> curseEvent3;
+    UnityEvent<Player, Enemy> curseEvent4;
+    UnityEvent<Player, Enemy> curseEvent5;
 
-    public Text equipment_bar;
-    public Text hand_out_card_1;
-    public Text hand_out_card_2;
-    public Text hand_out_card_3;
-    public Text hand_out_card_4;
-    public Text hand_out_card_5;
-    public Text hand_in_card_1;
-    public Text hand_in_card_2;
-    public Text hand_in_card_3;
-    public Text hand_in_card_4;
-    public Text hand_in_card_5;
-    public Text hand_in_card_6;
-    public Text hand_in_card_7;
-    public Text hand_in_card_8;
     public Text gameround;
-    public Text enemy1;
-    public Text enemy2;
-    public Text enemy3;
     public Text enemy_now;
     public Text detial;
 
     Skills skill = new Skills();
     Player player = new Player(100);
-    Enemy enemy = new Enemy();
     Manager manager = new Manager();
     #endregion
     private void Start()
@@ -59,12 +89,12 @@ public class Combat_System : MonoBehaviour
             for (int i = Message.Msg.hand_in_card_list.Count; i < Message.Msg.Hand_in_card_num_max; i++)
             {
                 manager.Get_card();
-                if (manager.Search_equipment("club10")) clubEvent10.Invoke(player, enemy);
-                //创建实例
+                manager.LoadCard(i, "card");
+                if (manager.Search_equipment("club10")) clubEvent10.Invoke(player, Message.Msg.Enemy_Now);
             }
 
         //默认指定第一个怪物
-        enemy = Message.Msg.enemy_fight[0];
+        Message.Msg.Enemy_Now = Message.Msg.enemy_fight[0];
 
         clubEvent3.AddListener(skill.Club3);
         clubEvent4.AddListener(skill.Club4);
@@ -84,11 +114,11 @@ public class Combat_System : MonoBehaviour
         curseEvent4.AddListener(skill.Curse4);
         curseEvent5.AddListener(skill.Curse5);
         //开局调用club
-        if (manager.Search_equipment("club3")) clubEvent3.Invoke(player, enemy);
-        if (manager.Search_equipment("club4")) clubEvent4.Invoke(player, enemy);
-        if (manager.Search_equipment("club5")) clubEvent5.Invoke(player, enemy);
-        if (manager.Search_equipment("clubJ")) clubEventJ.Invoke(player, enemy);
-        if (manager.Search_equipment("clubA")) clubEventA.Invoke(player, enemy);
+        if (manager.Search_equipment("club3")) clubEvent3.Invoke(player, Message.Msg.Enemy_Now);
+        if (manager.Search_equipment("club4")) clubEvent4.Invoke(player, Message.Msg.Enemy_Now);
+        if (manager.Search_equipment("club5")) clubEvent5.Invoke(player, Message.Msg.Enemy_Now);
+        if (manager.Search_equipment("clubJ")) clubEventJ.Invoke(player, Message.Msg.Enemy_Now);
+        if (manager.Search_equipment("clubA")) clubEventA.Invoke(player, Message.Msg.Enemy_Now);
         foreach (Enemy e in Message.Msg.enemy_fight)
         {
             if (manager.Search_equipment("curse4")) curseEvent4.Invoke(player, e);
@@ -98,8 +128,13 @@ public class Combat_System : MonoBehaviour
     //初始化游戏内容
     private void Game_Init()
     {
+        for (int i = 0; i < 20; i++)
+        {
+            Replenish();
+            Replenish_enemy();
+        }
         #region 创建卡牌实例
-        
+
         Card d3 = new Card("diamond", "3", 3, "null", 3);
         Card d4 = new Card("diamond", "4", 4, "null", 4);
         Card d5 = new Card("diamond", "5", 5, "null", 5);
@@ -197,25 +232,25 @@ public class Combat_System : MonoBehaviour
         Message.Msg.bank_in_cards.Add(sQ);
         Message.Msg.bank_in_cards.Add(sK);
         Message.Msg.bank_in_cards.Add(sA);
-        //装备卡
-        Message.Msg.equipment_bar.Add(c3);
-        Message.Msg.equipment_bar.Add(c4);
-        Message.Msg.equipment_bar.Add(c5);
-        Message.Msg.equipment_bar.Add(c6);
-        Message.Msg.equipment_bar.Add(c7);
-        Message.Msg.equipment_bar.Add(c8);
-        Message.Msg.equipment_bar.Add(c9);
-        Message.Msg.equipment_bar.Add(c10);
-        Message.Msg.equipment_bar.Add(cJ);
-        Message.Msg.equipment_bar.Add(cQ);
-        Message.Msg.equipment_bar.Add(cK);
-        Message.Msg.equipment_bar.Add(cA);
-        //诅咒卡
-        Message.Msg.equipment_bar.Add(z1);
-        Message.Msg.equipment_bar.Add(z2);
-        Message.Msg.equipment_bar.Add(z3);
-        Message.Msg.equipment_bar.Add(z4);
-        Message.Msg.equipment_bar.Add(z5);
+        ////装备卡
+        //Message.Msg.equipment_bar.Add(c3);
+        //Message.Msg.equipment_bar.Add(c4);
+        //Message.Msg.equipment_bar.Add(c5);
+        //Message.Msg.equipment_bar.Add(c6);
+        //Message.Msg.equipment_bar.Add(c7);
+        //Message.Msg.equipment_bar.Add(c8);
+        //Message.Msg.equipment_bar.Add(c9);
+        //Message.Msg.equipment_bar.Add(c10);
+        //Message.Msg.equipment_bar.Add(cJ);
+        //Message.Msg.equipment_bar.Add(cQ);
+        //Message.Msg.equipment_bar.Add(cK);
+        //Message.Msg.equipment_bar.Add(cA);
+        ////诅咒卡
+        //Message.Msg.equipment_bar.Insert(0, z1);
+        //Message.Msg.equipment_bar.Insert(0, z2);
+        //Message.Msg.equipment_bar.Insert(0, z3);
+        //Message.Msg.equipment_bar.Insert(0, z4);
+        //Message.Msg.equipment_bar.Insert(0, z5);
         //技能卡
         Message.Msg.bank_in_cards.Add(h3);
         Message.Msg.bank_in_cards.Add(h4);
@@ -233,42 +268,132 @@ public class Combat_System : MonoBehaviour
         Message.Msg.enemy_fight.Add(e1);
         Message.Msg.enemy_fight.Add(e2);
         Message.Msg.enemy_fight.Add(e3);
+        //装备实例
+        for (int i = 0; i < Message.Msg.equipment_bar.Count; i++)
+        {
+            manager.LoadCard(i, "equip");
+        }
+        for (int i = 0; i < Message.Msg.enemy_fight.Count; i++)
+        {
+            manager.LoadEnemy(i, "enemy");
+        }
         #endregion
+    }
+    void Replenish()
+    {    
+         GameObject prefab = Resources.Load<GameObject>("Prefabs/card");
+         // 如果池空了，创建新对象
+         GameObject newObj = Instantiate(prefab, transform);
+         newObj.SetActive(true);
+         Message.Msg.pool.Enqueue(newObj);
+    }
+    void Replenish_enemy()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/enemy");
+        // 如果池空了，创建新对象
+        GameObject newObj = Instantiate(prefab, transform);
+        newObj.SetActive(true);
+        Message.Msg.enemy_pool.Enqueue(newObj);
     }
     private void Update()
     {
+        //if (Message.Msg.pool.Count == 0) Replenish();
         gameround.text = Message.Msg.Round.ToString();
+        //创建手牌实例
+        Debug.Log("in:"+Message.Msg.hand_in_card_list.Count + ":" + Message.Msg.hand_in_instances.Count);
+        Debug.Log("out:" + Message.Msg.hand_out_card_list.Count + ":" + Message.Msg.hand_out_instances.Count);
+        Debug.Log("e:" + Message.Msg.enemy_fight.Count + ":" + Message.Msg.enemy_instances.Count);
+        for (int i =0; i < Message.Msg.hand_in_card_list.Count; i++)
+        {
 
-        hand_in_card_1.text = Show_card_in(0);
-        hand_in_card_2.text = Show_card_in(1);
-        hand_in_card_3.text = Show_card_in(2);
-        hand_in_card_4.text = Show_card_in(3);
-        hand_in_card_5.text = Show_card_in(4);
-        hand_in_card_6.text = Show_card_in(5);
-        hand_in_card_7.text = Show_card_in(6);
-        hand_in_card_8.text = Show_card_in(7);
+            GameObject instance = Message.Msg.hand_in_instances[i];
+            // 设置父对象
+            instance.transform.SetParent(hand_in_list.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
 
-        hand_out_card_1.text = Show_card_out(0);
-        hand_out_card_2.text = Show_card_out(1);
-        hand_out_card_3.text = Show_card_out(2);
-        hand_out_card_4.text = Show_card_out(3);
-        hand_out_card_5.text = Show_card_out(4);
+            // 设置位置（中心点坐标）
+            rt.anchoredPosition = potision[i]; // 向右100像素，向下50像素
 
-        equipment_bar.text = Show_equipment(0);
+             Transform childTransform = instance.transform.Find("Name");
+             if (childTransform != null)
+             {   
+                 GameObject childObject = childTransform.gameObject;
+                 // 使用子对象...
+                 childObject.GetComponent<Text>().text = Message.Msg.hand_in_card_list[i].type+ '\n' + Message.Msg.hand_in_card_list[i].point_show;
+             }
+        }
+        //创建出牌列表实例
+        for (int i = 0; i < Message.Msg.hand_out_card_list.Count; i++)
+        {
+            GameObject instance = Message.Msg.hand_out_instances[i];
+            // 设置父对象
+            instance.transform.SetParent(hand_out_list.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
 
-        enemy1.text = Show_enemy(0);
-        enemy2.text = Show_enemy(1);
-        enemy3.text = Show_enemy(2);
+            // 设置位置（中心点坐标）
+            rt.anchoredPosition = potision[i]; // 向右100像素，向下50像素
+
+
+            Transform childTransform = instance.transform.Find("Name");
+            if (childTransform != null)
+            {
+                GameObject childObject = childTransform.gameObject;
+                // 使用子对象...
+                childObject.GetComponent<Text>().text = Message.Msg.hand_out_card_list[i].type + '\n' + Message.Msg.hand_out_card_list[i].point_show;
+            }
+        }
+        //创建装备列表实例
+        for (int i = 0; i < Message.Msg.equipment_instances.Count; i++)
+        {
+            GameObject instance = Message.Msg.equipment_instances[i];
+            // 设置父对象
+            instance.transform.SetParent(equipment_list.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
+
+            // 设置位置（中心点坐标）
+            rt.anchoredPosition = potisions[i]; // 向右100像素，向下50像素
+
+            Transform childTransform = instance.transform.Find("Name");
+            if (childTransform != null)
+            {
+                GameObject childObject = childTransform.gameObject;
+                // 使用子对象...
+                childObject.GetComponent<Text>().text = Message.Msg.equipment_bar[i].type + '\n' + Message.Msg.equipment_bar[i].point_show;
+            }
+        }
+        //创建敌人列表实例
+        for (int i = 0; i < Message.Msg.enemy_instances.Count; i++)
+        {
+            GameObject instance = Message.Msg.enemy_instances[i];
+            // 设置父对象
+            instance.transform.SetParent(enemy_list.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
+
+            // 设置位置（中心点坐标）
+            rt.anchoredPosition = potision_e[i]; // 向右100像素，向下50像素
+
+            Transform childTransform = instance.transform.Find("Name");
+            if (childTransform != null)
+            {
+                GameObject childObject = childTransform.gameObject;
+                // 使用子对象...
+                childObject.GetComponent<Text>().text = Message.Msg.enemy_fight[i].enemy_health.ToString();
+            }
+        }
 
         detial.text = "玩家血量:" + player.player_health.ToString() + '\n' +
                       //"玩家攻击值:" + player.player_attack_point.ToString() + '\n' +
                       //"玩家技能攻击值:" + player.player_skill_point.ToString() + '\n' +
                       "玩家护甲值:" + player.player_armor_point_origin.ToString() + '\n' +
-                      "当前敌人血量:" + enemy.enemy_health.ToString() + '\n' +
-                      "当前敌人攻击值:" + enemy.enemy_attack_point.ToString() + '\n' +
-                      "当前敌人护甲值:" + enemy.enemy_armor_point.ToString() + '\n' +
+                      "当前敌人血量:" + Message.Msg.Enemy_Now.enemy_health.ToString() + '\n' +
+                      "当前敌人攻击值:" + Message.Msg.Enemy_Now.enemy_attack_point.ToString() + '\n' +
+                      "当前敌人护甲值:" + Message.Msg.Enemy_Now.enemy_armor_point.ToString() + '\n' +
                       //"玩家受到伤害:" + player.player_get_hurt.ToString() + '\n' +
-                      "当前敌人受到伤害:" + enemy.enemy_get_hurt.ToString();
+                      "当前敌人受到伤害:" + Message.Msg.Enemy_Now.enemy_get_hurt.ToString();
 
         //检测怪物是否死亡
         if (Message.Msg.enemy_fight.Count <= 0) Debug.Log("game win");
@@ -277,42 +402,24 @@ public class Combat_System : MonoBehaviour
         manager.Death_player(player);
 
         //判断是否击杀怪物
-        if (manager.Death_enemy(enemy) && Message.Msg.enemy_fight.Count > 0) enemy = Message.Msg.enemy_fight[0];
+        if (manager.Death_enemy(Message.Msg.Enemy_Now) && Message.Msg.enemy_fight.Count > 0) Message.Msg.Enemy_Now = Message.Msg.enemy_fight[0];
 
     }
     #region 外部调用方法
-    public string Show_equipment(int n)
-    {
-        return Message.Msg.equipment_bar[n].type + Message.Msg.equipment_bar[n].point_show;
-    }
     public string Show_enemy(int n)
     {
         if (Message.Msg.enemy_fight.Count <= n) return null;
         return Message.Msg.enemy_fight[n].enemy_health.ToString();
     }
-    public string Show_card_in(int n)
-    {
-        if (Message.Msg.hand_in_card_list.Count <= n) return null;
-        return Message.Msg.hand_in_card_list[n].type + Message.Msg.hand_in_card_list[n].point_show;
-    }
-    public string Show_card_out(int n)
-    {
-        if (Message.Msg.hand_out_card_list.Count <= n) return null;
-        return Message.Msg.hand_out_card_list[n].type + Message.Msg.hand_out_card_list[n].point_show;
-    }
-    public void Select_enemy(int n)
-    {
-        if (Message.Msg.enemy_fight.Count <= n) return;
-        enemy = Message.Msg.enemy_fight[n];
-    }
+
     //更新回合_Fight按钮
     public void Next_round()
     {
         //增加回合数
         Message.Msg.Round += 1;
         //执行卡牌效果，计算牌型倍率，清空选中卡牌
-        Use_card(player, enemy);
-        if (manager.Search_equipment("curse3")) curseEvent3.Invoke(player, enemy);
+        Use_card(player, Message.Msg.Enemy_Now);
+        if (manager.Search_equipment("curse3")) curseEvent3.Invoke(player, Message.Msg.Enemy_Now);
         //回合结束清空加成
         manager.Data_clear_player(player,false);
         //从牌库补充卡牌至上限
@@ -321,7 +428,8 @@ public class Combat_System : MonoBehaviour
             {
                 if (Message.Msg.bank_in_cards.Count <= 0) break;
                 manager.Get_card();
-                if (manager.Search_equipment("club10")) clubEvent10.Invoke(player, enemy);
+                manager.LoadCard(i,"card");
+                if (manager.Search_equipment("club10")) clubEvent10.Invoke(player, Message.Msg.Enemy_Now);
                 //创建实例
             }
         //判断玩家回合是否结束
@@ -332,7 +440,7 @@ public class Combat_System : MonoBehaviour
             {
                 foreach (string action in Message.Msg.round_end_action)
                 {
-                    skill.Get_skills(action,player,enemy);
+                    skill.Get_skills(action,player,Message.Msg.Enemy_Now);
                 }
             }
             //进入怪物回合
@@ -340,18 +448,18 @@ public class Combat_System : MonoBehaviour
             Enemy_attack();
             //回合结束清空加成
             manager.Data_clear_player(player, true);
-            manager.Data_clear_enemy(enemy);
+            manager.Data_clear_enemy(Message.Msg.Enemy_Now);
             manager.Data_clear_card();
             //重置回合数
             Message.Msg.Round = 1;
             //判断是否调用club
-            if (manager.Search_equipment("club3")) clubEvent3.Invoke(player, enemy);
-            if (manager.Search_equipment("club4")) clubEvent4.Invoke(player, enemy);
-            if (manager.Search_equipment("club5")) clubEvent5.Invoke(player, enemy);
-            if (manager.Search_equipment("club8")) clubEvent8.Invoke(player, enemy);
-            if (manager.Search_equipment("clubJ")) clubEventJ.Invoke(player, enemy);
-            if (manager.Search_equipment("clubK")) clubEventK.Invoke(player, enemy);
-            if (manager.Search_equipment("clubA")) clubEventA.Invoke(player, enemy);
+            if (manager.Search_equipment("club3")) clubEvent3.Invoke(player, Message.Msg.Enemy_Now);
+            if (manager.Search_equipment("club4")) clubEvent4.Invoke(player, Message.Msg.Enemy_Now);
+            if (manager.Search_equipment("club5")) clubEvent5.Invoke(player, Message.Msg.Enemy_Now);
+            if (manager.Search_equipment("club8")) clubEvent8.Invoke(player, Message.Msg.Enemy_Now);
+            if (manager.Search_equipment("clubJ")) clubEventJ.Invoke(player, Message.Msg.Enemy_Now);
+            if (manager.Search_equipment("clubK")) clubEventK.Invoke(player, Message.Msg.Enemy_Now);
+            if (manager.Search_equipment("clubA")) clubEventA.Invoke(player, Message.Msg.Enemy_Now);
             foreach (Enemy e in Message.Msg.enemy_fight)
             {
                 if (manager.Search_equipment("curse4")) curseEvent4.Invoke(player, e);
@@ -410,45 +518,19 @@ public class Combat_System : MonoBehaviour
             if (manager.Search_equipment("club6")) clubEvent6.Invoke(player, e);
         }
     }
-    //单击卡牌加入准备列表，Select_card的外部调用
-    public void OnCardClick(int n)
-    {
-        if(Message.Msg.hand_out_card_list.Count >= Message.Msg.Hand_out_card_num_max) return;
-        if(Message.Msg.hand_in_card_list.Count > n)
-            Select_card(Message.Msg.hand_in_card_list[n]);
-    }
-    //选中手牌
-    public void Select_card(Card card)
-    {
-        if(card.type == "diamond" || card.type == "spade") 
-            Message.Msg.hand_out_card_list.Insert(0, card);
-        else 
-            Message.Msg.hand_out_card_list.Add(card);
-        Message.Msg.hand_in_card_list.Remove(card);
-        //将手牌实例移至待出牌区
-    }
-    //单击卡牌退出准备列表，UnSelect_card的外部调用
-    public void OnUnCardClick(int n)
-    {
-        if (Message.Msg.hand_out_card_list.Count > n)
-            UnSelect_card(Message.Msg.hand_out_card_list[n]);
-    }
-    //取消选择手牌
-    public void UnSelect_card(Card card)
-    {
-        Message.Msg.hand_in_card_list.Add(card);
-        Message.Msg.hand_out_card_list.Remove(card);
-    }
     //弃牌_Drop
     public void Drop_card()
     {
-        foreach (Card c in Message.Msg.hand_out_card_list)
+        for (int i = 0; i < Message.Msg.hand_out_card_list.Count;i++)
         {
-            c.isused = true;
-            c.isshowed = false;
-            Message.Msg.bank_out_cards.Add(c);
+            Message.Msg.hand_out_card_list[i].isused = true;
+            Message.Msg.hand_out_card_list[i].isshowed = false;
+            Message.Msg.bank_out_cards.Add(Message.Msg.hand_out_card_list[i]);
+            manager.ReturnObject(Message.Msg.hand_out_instances[i]);
+            Message.Msg.hand_out_instances.Remove(Message.Msg.hand_out_instances[i]);
+            Message.Msg.hand_out_card_list.Remove(Message.Msg.hand_out_card_list[i]);
         }
-        Message.Msg.hand_out_card_list.Clear();
+
     }
     //打出手牌
     public void Use_card(Player player, Enemy enemy)
@@ -963,7 +1045,6 @@ public class Manager
                 Message.Msg.bank_out_cards.Remove(Message.Msg.hand_in_card_list[n]);
             }
         }
-
     }
     public void Get_hurt_player(Player player, Enemy enemy)
     {
@@ -1066,5 +1147,140 @@ public class Manager
             if(name == card.type + card.point_show) return true;
         }
         return false;
+    }
+    // 从池中获取对象
+    public GameObject GetObject()
+    {
+        GameObject obj = Message.Msg.pool.Dequeue();
+        obj.SetActive(true);
+        return obj;
+    }
+    // 将对象返回池中
+    public void ReturnObject(GameObject obj)
+    {
+        obj.SetActive(false);
+        Message.Msg.pool.Enqueue(obj);
+    }
+    // 从池中获取对象
+    public GameObject GetEnemy()
+    {
+        GameObject obj = Message.Msg.enemy_pool.Dequeue();
+        obj.SetActive(true);
+        return obj;
+    }
+    // 将对象返回池中
+    public void ReturnEnemy(GameObject obj)
+    {
+        obj.SetActive(false);
+        Message.Msg.enemy_pool.Enqueue(obj);
+    }
+    public void LoadCard(int n, string type)
+    {
+        // 不需要文件扩展名，路径相对于Resources文件夹
+        GameObject prefab = GetObject();
+        if (prefab == null)
+        {
+            Debug.LogError("Prefab not found in Resources folder!");
+            return;
+        }
+        if (type == "card")
+        {
+            // 实例化到场景中
+            Button btn = prefab.GetComponent<Button>();
+            btn.onClick.AddListener(() =>
+            {
+                OnCardClick(prefab);
+            });
+            Message.Msg.hand_in_instances.Add(prefab);
+        }
+        else if (type == "equip")
+        {
+            // 实例化到场景中
+            Message.Msg.equipment_instances.Add(prefab);
+        }
+        else
+        {
+            Debug.Log("can not found this prefab type");
+        }
+    }
+    public void LoadEnemy(int n, string type)
+    {
+        // 不需要文件扩展名，路径相对于Resources文件夹
+        GameObject prefab = GetEnemy();
+        if (prefab == null)
+        {
+            Debug.LogError("Prefab not found in Resources folder!");
+            return;
+        }
+        if (type == "enemy")
+        {
+            // 实例化到场景中
+            Button btn = prefab.GetComponent<Button>();
+            btn.onClick.AddListener(() =>
+            {
+                OnEnemyClick(prefab);
+            });
+            Message.Msg.enemy_instances.Add(prefab);
+        }
+        else
+        {
+            Debug.Log("can not found this prefab type");
+        }
+    }
+    //单击卡牌
+    public void OnCardClick(GameObject gameObject)
+    {
+        if (Message.Msg.hand_out_instances.Contains(gameObject))
+        {
+            int pos = Message.Msg.hand_out_instances.IndexOf(gameObject);
+            UnSelect_card(pos);
+        }
+        else if (Message.Msg.hand_in_instances.Contains(gameObject))
+        {
+            int pos = Message.Msg.hand_in_instances.IndexOf(gameObject);
+            Select_card(pos);
+        }
+        else
+        {
+            Debug.Log("can not found card");
+        }
+    }
+    public void OnEnemyClick(GameObject gameObject)
+    {   
+        if (Message.Msg.enemy_instances.Contains(gameObject))
+        {
+            Debug.Log("enemy change");
+            int pos = Message.Msg.enemy_instances.IndexOf(gameObject);
+            Message.Msg.Enemy_Now = Message.Msg.enemy_fight[pos];
+        }
+        else
+        {
+            Debug.Log("can not found enemy");
+        }
+        
+    }
+    //选中手牌
+    public void Select_card(int n)
+    {
+        if (Message.Msg.hand_in_card_list[n].type == "diamond" || Message.Msg.hand_in_card_list[n].type == "spade")
+        {
+            Message.Msg.hand_out_card_list.Insert(0, Message.Msg.hand_in_card_list[n]);
+            Message.Msg.hand_out_instances.Insert(0, Message.Msg.hand_in_instances[n]);
+        }
+        else
+        {
+            Message.Msg.hand_out_card_list.Add(Message.Msg.hand_in_card_list[n]);
+            Message.Msg.hand_out_instances.Add(Message.Msg.hand_in_instances[n]);
+        }
+        Message.Msg.hand_in_card_list.Remove(Message.Msg.hand_in_card_list[n]);
+        Message.Msg.hand_in_instances.Remove(Message.Msg.hand_in_instances[n]);
+    }
+    //取消选择手牌
+    public void UnSelect_card(int n)
+    {
+        Message.Msg.hand_in_card_list.Add(Message.Msg.hand_out_card_list[n]);
+        Message.Msg.hand_in_instances.Add(Message.Msg.hand_out_instances[n]);
+        Message.Msg.hand_out_card_list.Remove(Message.Msg.hand_out_card_list[n]);
+        Message.Msg.hand_out_instances.Remove(Message.Msg.hand_out_instances[n]);
     }
 }

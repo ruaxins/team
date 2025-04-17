@@ -19,6 +19,12 @@ public class Message
     public List<string> round_end_action = new List<string>();//结束行动列表
     public List<Enemy> enemy_bank = new List<Enemy>();//怪物池
     public List<Enemy> enemy_fight = new List<Enemy>();//战斗中的怪物
+    public List<GameObject> hand_in_instances = new List<GameObject>();//手牌实例
+    public List<GameObject> hand_out_instances = new List<GameObject>();//出牌列表实例
+    public List<GameObject> enemy_instances = new List<GameObject>();//敌人实例
+    public List<GameObject> equipment_instances = new List<GameObject>();//装备牌实例
+    public Queue<GameObject> pool = new Queue<GameObject>();//实例池
+    public Queue<GameObject> enemy_pool = new Queue<GameObject>();//怪物池
     //最大手牌数
     int hand_in_card_num_max = 8;
     public int Hand_in_card_num_max { get => hand_in_card_num_max; set => hand_in_card_num_max = value; }
@@ -46,6 +52,13 @@ public class Message
     //当前选择的卡牌
     int card_choose = 0;
     public int Card_choose { get => card_choose; set => card_choose = value; }
+
+    //是否锁定
+    bool isLock = false;
+    public bool IsLock { get => isLock; set => isLock = value; }
+
+    Enemy enemy_now = null;
+    public Enemy Enemy_Now { get => enemy_now; set => enemy_now = value; }
 
     private static Message message;
     private Message() { }
