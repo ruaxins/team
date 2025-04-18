@@ -64,6 +64,7 @@
     <Compile Include="Assets\c#\forhp.cs" />
     <Compile Include="Assets\test641.cs" />
     <Compile Include="Assets\MySystem\Combat_System.cs" />
+    <Compile Include="Assets\MySystem\Round_Messages.cs" />
     <Compile Include="Assets\c#\person.cs" />
     <Compile Include="Assets\c#\buff.cs" />
     <Compile Include="Assets\MySystem\Messages.cs" />
