@@ -613,9 +613,9 @@ MonoBehaviour:
   combat_exit: {fileID: 178816900}
   settings: {fileID: 1190079436}
   manager: {fileID: 369360789}
-  select: {fileID: 0}
-  drop: {fileID: 0}
-  fight: {fileID: 0}
+  select: {fileID: 882099527}
+  drop: {fileID: 906130313}
+  fight: {fileID: 1547407502}
   enable_x: 1
   enable_e: 1
   enable_f: 1
