@@ -10,6 +10,7 @@ public class Round_Message
 {
     //游戏内全局变量
     public List<Card> equipment_bar = new List<Card>();//装备栏
+    public List<Card> bank_in_cards = new List<Card>();//牌库
     public List<Card> bank_out_cards = new List<Card>();//弃牌堆
     public List<Card> hand_in_card_list = new List<Card>();//手牌
     public List<Card> hand_out_card_list = new List<Card>();//出牌列表
@@ -55,9 +56,12 @@ public class Round_Message
     //当前选择的卡牌
     int card_choose = 0;
     public int Card_choose { get => card_choose; set => card_choose = value; }
-
+    //当前选择怪物
     Enemy enemy_now = null;
     public Enemy Enemy_Now { get => enemy_now; set => enemy_now = value; }
+    //玩家
+    Player player = null;
+    public Player Player { get => player; set => player = value; }
 
     private static Round_Message round_message;
     private Round_Message() { }
