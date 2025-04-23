@@ -197,16 +197,16 @@ public class Skills
     public void Club8(Player player, Enemy enemy)
     {
         int curse = 0;
-        foreach (Card card in Round_Message.RMsg.equipment_bar)
+        foreach (string card in Round_Message.RMsg.enemy_instances)
         {
-            if (card.type == "curse") curse++;
+            if (manager.Get_Card_Data(card).type == "curse") curse++;
         }
         if ((player.player_health + 5 * curse) > player.player_health_max) player.player_health = player.player_health_max;
         else player.player_health += (5 * curse);
     }
     public void Club9(Player player, Enemy enemy)
     {
-        if (Round_Message.RMsg.hand_out_card_list.Count == 4) player.scale *= 2;
+        if (Round_Message.RMsg.hand_out_instances.Count == 4) player.scale *= 2;
     }
     public void Club10(Player player, Enemy enemy)
     {
@@ -219,7 +219,7 @@ public class Skills
     }
     public void ClubQ(Player player, Enemy enemy)
     {
-        if (Round_Message.RMsg.hand_out_card_list.Count <= 3) player.scale *= 3;
+        if (Round_Message.RMsg.hand_out_instances.Count <= 3) player.scale *= 3;
     }
     public void ClubK(Player player, Enemy enemy)
     {
@@ -316,7 +316,8 @@ public class Enemy
     }
     public void Attack_mode_3(Player player, Enemy enemy)
     {
-        Round_Message.RMsg.enemy_fight.Add(enemy);
+        if(!Round_Message.RMsg.enemy_instances.Contains("fire_ghost"))
+            Round_Message.RMsg.enemy_instances.Add("fire_ghost");
     }
     public void Attack_mode_4(Player player, Enemy enemy)
     {
@@ -333,11 +334,9 @@ public class Enemy
     }
     public void Attack_mode_6(Player player, Enemy enemy)
     {
-        int r = random.Next(0, Round_Message.RMsg.hand_in_card_list.Count);
-        Round_Message.RMsg.hand_in_card_list[r].isused = true;
-        Round_Message.RMsg.hand_in_card_list[r].isshowed = false;
-        Round_Message.RMsg.bank_out_cards.Add(Round_Message.RMsg.hand_in_card_list[r]);
-        Round_Message.RMsg.hand_in_card_list.Remove(Round_Message.RMsg.hand_in_card_list[r]);
+        int r = random.Next(0, Round_Message.RMsg.hand_in_instances.Count);
+        Round_Message.RMsg.bank_out_instances.Add(Round_Message.RMsg.hand_in_instances[r]);
+        Round_Message.RMsg.hand_in_instances.Remove(Round_Message.RMsg.hand_in_instances[r]);
     }
     public void Attack_mode_7(Player player, Enemy enemy)
     {
@@ -368,8 +367,12 @@ public class Player
     public float player_armor_point = 0;
     public float player_armor_point_origin = 0;
     public float player_get_hurt = 0;
+    //增强
     public int player_enhance = 0;
+    //抵挡
     public int player_hold = 0;
+    //自刃
+    public int player_hurt = 0;
 
     public int scale = 1;
     public Player() { }
@@ -384,13 +387,132 @@ public class Manager
 {
     //初始化随机数
     System.Random random = new System.Random();
+    public bool Search_equipment(string name)
+    {
+        foreach (string card in Round_Message.RMsg.equipment_instances)
+        {
+            if (name == card) return true;
+        }
+        return false;
+    }
+    //单击卡牌
+    public void OnCardClick(string type)
+    {
+        GameObject card = Get_Card_Instances(type);
+        if (Round_Message.RMsg.hand_out_instances.Contains(type))
+        {
+            card.GetComponent<CardHoverEffect>().isInteractable = true;
+            Round_Message.RMsg.Hand_out_card_num--;
+            UnSelect_card(type);
+            return;
+        }
+        if (Round_Message.RMsg.hand_in_instances.Contains(type))
+        {
+            if (Round_Message.RMsg.Hand_out_card_num >= Round_Message.RMsg.Hand_out_card_num_max) return;
+            card.GetComponent<CardHoverEffect>().isInteractable = false;
+            Round_Message.RMsg.Hand_out_card_num++;
+            Select_card(type);
+            return;
+        }
+        Debug.Log("can not found card");
+    }
+    public void OnEnemyClick(string type)
+    {
+        if (Round_Message.RMsg.enemy_instances.Contains(type))
+        {
+            Debug.Log("enemy change");
+            Round_Message.RMsg.Enemy_Now = Get_Enemy_Data(type);
+        }
+        else
+        {
+            Debug.Log("can not found enemy");
+        }
+
+    }
+    //选中手牌
+    public void Select_card(string type)
+    {
+        if (Get_Card_Data(type).type == "diamond" || Get_Card_Data(type).type == "spade")
+        {
+            Round_Message.RMsg.hand_out_instances.Insert(0, type);
+        }
+        else
+        {
+            Round_Message.RMsg.hand_out_instances.Add(type);
+        }
+        Round_Message.RMsg.hand_in_instances.Remove(type);
+    }
+    //取消选择手牌
+    public void UnSelect_card(string type)
+    {
+        Round_Message.RMsg.hand_in_instances.Add(type);
+        Round_Message.RMsg.hand_out_instances.Remove(type);
+    }
+    //获取卡牌实例
+    public GameObject Get_Card_Instances(string type)
+    {
+        if (Message.Msg.instance_card.TryGetValue(type, out GameObject card))
+        {
+            return card;
+        }
+        return null;
+    }
+    //获取敌人实例
+    public GameObject Get_Enemy_Instances(string type)
+    {
+        if (Message.Msg.instance_enemy.TryGetValue(type, out GameObject enemy))
+        {
+            return enemy;
+        }
+        return null;
+    }
+    //获取卡牌类
+    public Card Get_Card_Data(string type)
+    {
+        if (Message.Msg.data_card.TryGetValue(type, out Card card))
+        {
+            return card;
+        }
+        return null;
+    }
+    //获取敌人类
+    public Enemy Get_Enemy_Data(string type)
+    {
+        if (Message.Msg.data_enemy.TryGetValue(type, out Enemy enemy))
+        {
+            return enemy;
+        }
+        return null;
+    }
+    //计算出牌列表的数值
+    public void Use_card(Player player, Enemy enemy)
+    {
+        float player_attack_point = 0;
+        float player_armor_point = 0;
+        foreach (string type in Round_Message.RMsg.hand_out_instances)
+        {
+            Card card = Get_Card_Data(type);
+            switch (card.type)
+            {
+                case "diamond": player_attack_point += card.point; break;
+                case "spade": player_armor_point += card.point; break;
+                case "heart":Round_Message.RMsg.skill_action.Add(type);break;
+                default:
+                    break;
+            }
+        }
+        player.player_attack_point = player_attack_point;
+        player.player_armor_point = player_armor_point;
+    }
+    //获取卡牌组合
     public void Get_card_combination(Player player)
     {
         List<int> weights = new List<int>();
         List<string> types = new List<string>();
         //排序
-        foreach (Card card in Round_Message.RMsg.hand_out_card_list)
+        foreach (string type in Round_Message.RMsg.hand_out_instances)
         {
+            Card card = Get_Card_Data(type);
             weights.Add(card.weight);
             types.Add(card.type);
         }
@@ -417,7 +539,6 @@ public class Manager
         int temp_straight = 1;
         foreach (int weight in weights)
         {
-            //Debug.Log(temp_num+":"+weight);
             if (temp != 0)
             {
                 if (weight == temp + 1) temp_straight++;
@@ -448,75 +569,13 @@ public class Manager
 
         player.scale = temp_scale;
     }
-    public void Get_card(int n = -1, bool place = true)
-    {
-        if (Round_Message.RMsg.bank_in_cards.Count <= 0) return;
-        if (place)
-        {
-            //从牌库
-            if (n == -1)
-            {
-                //随机卡牌
-                int r = random.Next(0, Round_Message.RMsg.bank_in_cards.Count);
-                Round_Message.RMsg.bank_in_cards[r].isshowed = true;
-                Round_Message.RMsg.hand_in_card_list.Add(Round_Message.RMsg.bank_in_cards[r]);
-                Round_Message.RMsg.bank_in_cards.Remove(Round_Message.RMsg.bank_in_cards[r]);
-            }
-            else
-            {
-                //指定卡牌
-                Round_Message.RMsg.hand_in_card_list[n].isshowed = true;
-                Round_Message.RMsg.hand_in_card_list.Add(Round_Message.RMsg.hand_in_card_list[n]);
-                Round_Message.RMsg.bank_in_cards.Remove(Round_Message.RMsg.hand_in_card_list[n]);
-            }
-        }
-        else
-        {
-            //从弃牌堆
-            if (n == -1)
-            {
-                //随机卡牌
-                int r = random.Next(0, Round_Message.RMsg.bank_out_cards.Count);
-                Round_Message.RMsg.bank_out_cards[r].isused = false;
-                Round_Message.RMsg.bank_in_cards[r].isshowed = true;
-                Round_Message.RMsg.hand_in_card_list.Add(Round_Message.RMsg.bank_out_cards[r]);
-                Round_Message.RMsg.bank_out_cards.Remove(Round_Message.RMsg.bank_out_cards[r]);
-            }
-            else
-            {
-                //指定卡牌
-                Round_Message.RMsg.hand_in_card_list[n].isused = false;
-                Round_Message.RMsg.hand_in_card_list[n].isshowed = true;
-                Round_Message.RMsg.hand_in_card_list.Add(Round_Message.RMsg.hand_in_card_list[n]);
-                Round_Message.RMsg.bank_out_cards.Remove(Round_Message.RMsg.hand_in_card_list[n]);
-            }
-        }
-    }
-    public void Get_hurt_player(Player player, Enemy enemy)
-    {
-        Debug.Log("玩家护甲：" + player.player_armor_point_origin + "敌人攻击：" + enemy.enemy_attack_point);
-        player.player_get_hurt = enemy.enemy_attack_point - player.player_armor_point_origin;
-        if (player.player_get_hurt > 0)
-        {
-            player.player_health -= (int)player.player_get_hurt;
-            player.player_armor_point_origin = 0;
-            Debug.Log("玩家受到伤害：" + player.player_get_hurt);
-        }
-        else
-        {
-            player.player_armor_point_origin = -player.player_get_hurt;
-            player.player_get_hurt = 0;
-            Debug.Log("玩家受到伤害：" + player.player_get_hurt);
-        }
-    }
+    //计算敌人受伤
     public void Get_hurt_ennemy(Player player, Enemy enemy)
     {
         //计算增强层数带来的攻击值加成
         player.player_skill_point += player.player_attack_point * 0.05f * player.player_enhance;
         //计算抵挡层数带来的护甲值加成
         player.player_armor_point += (player.player_armor_point * 0.05f * player.player_hold);
-        Debug.Log("玩家攻击值:" + player.player_attack_point + "玩家技能攻击值:" + player.player_skill_point +
-                    "玩家护甲：" + player.player_armor_point_origin + "玩家本回合护甲：" + player.player_armor_point + "玩家倍率:" + player.scale);
         //计算牌型带来的结算倍数
         player.player_attack_point *= player.scale;
         player.player_skill_point *= player.scale;
@@ -529,23 +588,122 @@ public class Manager
             {
                 enemy.enemy_health -= (int)enemy.enemy_get_hurt;
                 enemy.enemy_armor_point = 0;
-                Debug.Log("怪物受到伤害：" + enemy.enemy_get_hurt);
             }
             else
             {
                 enemy.enemy_armor_point = -enemy.enemy_get_hurt;
                 enemy.enemy_get_hurt = 0;
-                Debug.Log("怪物受到伤害：" + enemy.enemy_get_hurt);
             }
         }
         else
         {
             enemy.enemy_get_hurt = (player.player_attack_point + player.player_skill_point);
             enemy.enemy_health -= (int)enemy.enemy_get_hurt;
-            Debug.Log("怪物受到伤害：" + enemy.enemy_get_hurt);
         }
         enemy.enemy_have_armor = true;
     }
+    //计算玩家受伤
+    public void Get_hurt_player(Player player, Enemy enemy)
+    {
+        player.player_get_hurt = enemy.enemy_attack_point - player.player_armor_point_origin;
+        if (player.player_get_hurt > 0)
+        {
+            player.player_health -= (int)player.player_get_hurt;
+            player.player_armor_point_origin = 0;
+        }
+        else
+        {
+            player.player_armor_point_origin = -player.player_get_hurt;
+            player.player_get_hurt = 0;
+        }
+    }
+    //在场景中遭遇敌人
+    public void Get_Enemy_Outside(string type)
+    {
+        Message.Msg.enemy_in_instances.Add(type);
+    }
+    //在场景中获得卡牌
+    public void Get_Card_Outside(string type)
+    {
+        if (Message.Msg.card_bank.Count <= 0) return;
+        if (Message.Msg.bank_in_instances.Contains(type)) return;
+        Message.Msg.bank_in_instances.Add(type);
+    }
+    //从牌库（弃牌堆）获得随机（指定）卡牌
+    public void Get_card(bool place = true, string type = null)
+    {
+        if (place)
+        {
+            if (Round_Message.RMsg.bank_in_instances.Count <= 0) return;
+            //从牌库
+            if (type == null)
+            {
+                //随机卡牌
+                int r = random.Next(0, Round_Message.RMsg.bank_in_instances.Count);
+                Round_Message.RMsg.hand_in_instances.Add(Round_Message.RMsg.bank_in_instances[r]);
+                Round_Message.RMsg.bank_in_instances.Remove(Round_Message.RMsg.bank_in_instances[r]);
+            }
+            else
+            {
+                //指定卡牌
+                Round_Message.RMsg.hand_in_instances.Add(type);
+                Round_Message.RMsg.bank_in_instances.Remove(type);
+            }
+        }
+        else
+        {
+            if (Round_Message.RMsg.bank_out_instances.Count <= 0) return;
+            //从弃牌堆
+            if (type == null)
+            {
+                //随机卡牌
+                int r = random.Next(0, Round_Message.RMsg.bank_out_instances.Count);
+                Round_Message.RMsg.hand_out_instances.Add(Round_Message.RMsg.bank_out_instances[r]);
+                Round_Message.RMsg.bank_out_instances.Remove(Round_Message.RMsg.bank_out_instances[r]);
+            }
+            else
+            {
+                //指定卡牌
+                Round_Message.RMsg.hand_in_instances.Add(type);
+                Round_Message.RMsg.bank_out_instances.Remove(type);
+            }
+        }
+    }
+    //弃牌
+    public void Drop_card()
+    {
+        foreach (string card in Round_Message.RMsg.hand_out_instances)
+        {
+            Round_Message.RMsg.bank_out_instances.Add(card);
+            Get_Card_Instances(card).GetComponent<CardHoverEffect>().isInteractable = true;
+            Get_Card_Instances(card).transform.Find("Detial").gameObject.SetActive(false);
+            Get_Card_Instances(card).SetActive(false);
+        }
+        Round_Message.RMsg.hand_out_instances.Clear();
+        Round_Message.RMsg.Hand_out_card_num = 0;
+
+    }
+    //判断当前敌人是否死亡
+    public bool Death_enemy(Enemy enemy)
+    {
+        if (enemy.enemy_health <= 0)
+        {
+            string s = null;
+            foreach (var type in Message.Msg.data_enemy)
+            {
+                if (type.Value == enemy)
+                {
+                    s = type.Key;
+                    break;
+                }
+            }
+            Round_Message.RMsg.enemy_instances.Remove(s);
+            Debug.Log("enemy died");
+            return true;
+        }
+        return false;
+    }
+    //清空玩家数据
     public void Data_clear_player(Player player, bool endround)
     {
         player.player_get_hurt = 0;
@@ -561,179 +719,21 @@ public class Manager
             player.player_hold = 0;
         }
     }
+    //清空敌人数据
     public void Data_clear_enemy(Enemy enemy)
     {
         enemy.enemy_get_hurt = 0;
-        //enemy.enemy_attack_point = enemy.enemy_attack_point_origin;
-        //enemy.enemy_armor_point = enemy.enemy_armor_point_origin;
     }
+    //清空卡牌数据
     public void Data_clear_card()
     {
-        foreach (Card card in Round_Message.RMsg.bank_out_cards)
+        foreach (string card in Round_Message.RMsg.bank_out_instances)
         {
-            Round_Message.RMsg.bank_in_cards.Add(card);
+            Round_Message.RMsg.bank_in_instances.Add(card);
         }
-        Round_Message.RMsg.bank_out_cards.Clear();
+        Round_Message.RMsg.bank_out_instances.Clear();
         Round_Message.RMsg.round_end_action.Clear();
         Round_Message.RMsg.DropRound = 0;
-    }
-    public bool Death_enemy(Enemy enemy)
-    {
-        if (enemy.enemy_health <= 0)
-        {
-            int pos = Round_Message.RMsg.enemy_fight.IndexOf(enemy);
-            ReturnEnemy(Round_Message.RMsg.enemy_instances[pos]);
-            Round_Message.RMsg.enemy_fight.Remove(enemy);
-            Round_Message.RMsg.enemy_instances.Remove(Round_Message.RMsg.enemy_instances[pos]);
-            Debug.Log("enemy died");
-            return true;
-        }
-        return false;
-    }
-    public void Death_player(Player player)
-    {
-        if (player.player_health <= 0)
-            Debug.Log("game default");
-    }
-    public bool Search_equipment(string name)
-    {
-        foreach (Card card in Round_Message.RMsg.equipment_bar)
-        {
-            if (name == card.type + card.point_show) return true;
-        }
-        return false;
-    }
-    // 从池中获取对象
-    public GameObject GetObject()
-    {
-        GameObject obj = Round_Message.RMsg.pool.Dequeue();
-        obj.SetActive(true);
-        obj.AddComponent<CardHoverEffect>();
-        return obj;
-    }
-    // 将对象返回池中
-    public void ReturnObject(GameObject obj)
-    {
-        GameObject.Destroy(obj.GetComponent<CardHoverEffect>());
-        obj.SetActive(false);
-        Round_Message.RMsg.pool.Enqueue(obj);
-    }
-    // 从池中获取对象
-    public GameObject GetEnemy()
-    {
-        GameObject obj = Round_Message.RMsg.enemy_pool.Dequeue();
-        obj.SetActive(true);
-        return obj;
-    }
-    // 将对象返回池中
-    public void ReturnEnemy(GameObject obj)
-    {
-        obj.SetActive(false);
-        Round_Message.RMsg.enemy_pool.Enqueue(obj);
-    }
-    public void LoadCard(int n, string type)
-    {
-        // 不需要文件扩展名，路径相对于Resources文件夹
-        GameObject prefab = GetObject();
-        if (prefab == null)
-        {
-            Debug.LogError("Prefab not found in Resources folder!");
-            return;
-        }
-        if (type == "card")
-        {
-            // 实例化到场景中
-            Round_Message.RMsg.hand_in_instances.Add(prefab);
-        }
-        else if (type == "equip")
-        {
-            // 实例化到场景中
-            Round_Message.RMsg.equipment_instances.Add(prefab);
-        }
-        else
-        {
-            Debug.Log("can not found this prefab type");
-        }
-    }
-    public void LoadEnemy(int n, string type)
-    {
-        // 不需要文件扩展名，路径相对于Resources文件夹
-        GameObject prefab = GetEnemy();
-        if (prefab == null)
-        {
-            Debug.LogError("Prefab not found in Resources folder!");
-            return;
-        }
-        if (type == "enemy")
-        {
-            // 实例化到场景中
-            Round_Message.RMsg.enemy_instances.Add(prefab);
-        }
-        else
-        {
-            Debug.Log("can not found this prefab type");
-        }
-    }
-    //单击卡牌
-    public void OnCardClick(GameObject gameObject)
-    {
-        if (Round_Message.RMsg.hand_out_instances.Contains(gameObject))
-        {
-            Debug.Log("contains in out");
-            gameObject.GetComponent<CardHoverEffect>().isInteractable = true;
-            Round_Message.RMsg.Hand_out_card_num--;
-            int pos = Round_Message.RMsg.hand_out_instances.IndexOf(gameObject);
-            UnSelect_card(pos);
-            return;
-        }
-        if (Round_Message.RMsg.hand_in_instances.Contains(gameObject))
-        {
-            if (Round_Message.RMsg.Hand_out_card_num >= Round_Message.RMsg.Hand_out_card_num_max) return;
-            Debug.Log("contains in in");
-            gameObject.GetComponent<CardHoverEffect>().isInteractable = false;
-            Round_Message.RMsg.Hand_out_card_num++;
-            int pos = Round_Message.RMsg.hand_in_instances.IndexOf(gameObject);
-            Select_card(pos);
-            return;
-        }
-        Debug.Log("can not found card");
-    }
-    public void OnEnemyClick(GameObject gameObject)
-    {
-        if (Round_Message.RMsg.enemy_instances.Contains(gameObject))
-        {
-            Debug.Log("enemy change");
-            int pos = Round_Message.RMsg.enemy_instances.IndexOf(gameObject);
-            Round_Message.RMsg.Enemy_Now = Round_Message.RMsg.enemy_fight[pos];
-        }
-        else
-        {
-            Debug.Log("can not found enemy");
-        }
-
-    }
-    //选中手牌
-    public void Select_card(int n)
-    {
-        if (Round_Message.RMsg.hand_in_card_list[n].type == "diamond" || Round_Message.RMsg.hand_in_card_list[n].type == "spade")
-        {
-            Round_Message.RMsg.hand_out_card_list.Insert(0, Round_Message.RMsg.hand_in_card_list[n]);
-            Round_Message.RMsg.hand_out_instances.Insert(0, Round_Message.RMsg.hand_in_instances[n]);
-        }
-        else
-        {
-            Round_Message.RMsg.hand_out_card_list.Add(Round_Message.RMsg.hand_in_card_list[n]);
-            Round_Message.RMsg.hand_out_instances.Add(Round_Message.RMsg.hand_in_instances[n]);
-        }
-        Round_Message.RMsg.hand_in_card_list.Remove(Round_Message.RMsg.hand_in_card_list[n]);
-        Round_Message.RMsg.hand_in_instances.Remove(Round_Message.RMsg.hand_in_instances[n]);
-    }
-    //取消选择手牌
-    public void UnSelect_card(int n)
-    {
-        Round_Message.RMsg.hand_in_card_list.Add(Round_Message.RMsg.hand_out_card_list[n]);
-        Round_Message.RMsg.hand_in_instances.Add(Round_Message.RMsg.hand_out_instances[n]);
-        Round_Message.RMsg.hand_out_card_list.Remove(Round_Message.RMsg.hand_out_card_list[n]);
-        Round_Message.RMsg.hand_out_instances.Remove(Round_Message.RMsg.hand_out_instances[n]);
+        Round_Message.RMsg.Round = 0;
     }
 }
