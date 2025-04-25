@@ -1,67 +1,91 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
+using UnityEngine.UI;
+using static UnityEditor.PlayerSettings;
 
 public class Extra_Select_Manager : MonoBehaviour
 {
+    GameObject card_select;
+    GameObject select_list;
     Manager manager = new Manager();
-    //卡牌类型
-    string types;
-    //卡牌大类
-    string type;
+    List<Vector2> potision = new List<Vector2>
+    {
+        new Vector2(-650, 180),
+        new Vector2(-400, 180),
+        new Vector2(-150, 180),
+        new Vector2(100, 180),
+        new Vector2(350, 180),
+        new Vector2(600, 180),
+        new Vector2(-650, -180),
+        new Vector2(-400, -180),
+        new Vector2(-150, -180),
+    };
     private void Start()
     {
-        foreach (var s in Message.Msg.instance_card)
+    }
+    public void Flash()
+    {
+        if(Round_Message.RMsg.bank_in_instances.Count <= 0) return;
+        card_select.transform.position = manager.Get_Select_Instance(Round_Message.RMsg.Card_Now).transform.position;
+    }
+    public void Start_Select(List<string> list)
+    {
+        if (list.Count > 0) Round_Message.RMsg.Card_Now = list[0];
+        GameObject.Find("Manager").GetComponent<Btn_Controller>().select_box.SetActive(true);
+        select_list = GameObject.Find("select_list");
+        card_select = GameObject.Find("select_card");
+        if (list.Count <= 0)
         {
-            if (s.Value == gameObject)
+            Debug.Log("无卡牌可以选择");
+            return;
+        }
+
+        foreach (string type in list)
+        {
+            GameObject instance = manager.Get_Select_Instance(type);
+            instance.SetActive(true);
+            // 设置父对象
+            instance.transform.SetParent(select_list.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
+            // 设置位置（中心点坐标）
+            int pos = list.IndexOf(type);
+            rt.anchoredPosition = potision[pos];
+
+            Transform childTransform = instance.transform.Find("Name");
+            if (childTransform != null)
             {
-                types = s.Key;
-                break;
+                GameObject childObject = childTransform.gameObject;
+                // 使用子对象...
+                childObject.GetComponent<Text>().text = manager.Get_Card_Data(type).type + '\n' + manager.Get_Card_Data(type).point_show;
             }
         }
-        type = manager.Get_Card_Data(types).type;
     }
-    //从牌库选择指定卡牌
-    public void Heart8_plus()
+    public void StartSelectTurn()
     {
-        manager.Get_card(true, types);
+        StartCoroutine(SelectAction());
     }
-    //从弃牌堆选择指定卡牌
-    public void HeartJ_plus()
+    public IEnumerator SelectAction()
     {
-        manager.Get_card(false, types);
-    }
-    //从手牌选择卡牌并强化
-    public void Heart10_plus()
-    {
-        if (type == "diamond")
-            Round_Message.RMsg.Player.player_attack_point++;
-        else if (type == "spade")
-            Round_Message.RMsg.Player.player_armor_point++;
-        else
-            Debug.Log("该卡牌无法被强化");
-
-    }
-    //从手牌选择卡牌并转换
-    public void HeartA_plus()
-    {
-        if (type == "diamond")
+        Round_Message.RMsg.IsComplete = false;
+        switch (Round_Message.RMsg.select_action[0])
         {
-            Round_Message.RMsg.Player.player_attack_point -= manager.Get_Card_Data(types).point;
-            Round_Message.RMsg.Player.player_armor_point += manager.Get_Card_Data(types).point;
+            case "heart8": Start_Select(Round_Message.RMsg.bank_in_instances); break;
+            case "heartJ": Start_Select(Round_Message.RMsg.bank_out_instances); break;
+            case "heart10": Start_Select(Round_Message.RMsg.hand_in_instances); break;
+            case "heartA": Start_Select(Round_Message.RMsg.hand_in_instances); break;
+            default:
+                break;
         }
-        else if (type == "spade")
+        while (!Round_Message.RMsg.IsComplete)
         {
-            Round_Message.RMsg.Player.player_attack_point += manager.Get_Card_Data(types).point;
-            Round_Message.RMsg.Player.player_armor_point -= manager.Get_Card_Data(types).point;
+            Flash();
+            yield return null;
         }
-        else
-            Debug.Log("该卡牌无法被转换");
-    }
-    //从手牌选择卡牌复制并加入牌库
-    public void ClubA_plus()
-    {
-        Round_Message.RMsg.bank_in_instances.Add(types);
-        manager.Get_card();
     }
 }

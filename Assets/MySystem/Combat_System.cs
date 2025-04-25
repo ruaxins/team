@@ -44,8 +44,6 @@ public class Combat_System : MonoBehaviour
     Skills skill = new Skills();
     Manager manager = new Manager();
 
-    public enum TurnState { PlayerTurn, EnemyTurn, TurnEnd }
-    public TurnState currentState;
     #endregion
     private void Start()
     {
@@ -71,6 +69,10 @@ public class Combat_System : MonoBehaviour
         foreach (string card in Message.Msg.bank_in_instances)
         {
             Round_Message.RMsg.bank_in_instances.Add(card);
+        }
+        foreach (string card in Message.Msg.equipement_instance)
+        {
+            Round_Message.RMsg.equipment_instances.Add(card);
         }
         foreach (string enemy in Message.Msg.enemy_in_instances)
         {
@@ -188,26 +190,48 @@ public class Combat_System : MonoBehaviour
         }
         card_combination.text = "当前牌型倍率：" + Round_Message.RMsg.Player.scale.ToString();
         card_attack.text = "玩家攻击值：" + Round_Message.RMsg.Player.player_attack_point.ToString();
-        card_defend.text = "玩家护甲值：" + Round_Message.RMsg.Player.player_armor_point.ToString();
+        card_defend.text = "玩家护甲值：" + Round_Message.RMsg.Player.player_armor_point_origin.ToString();
 
         gameround.text = Round_Message.RMsg.Round.ToString();
-
+        // 判断当前怪物是否死亡
+        if (Round_Message.RMsg.enemy_instances.Count > 0 && manager.Death_enemy(Round_Message.RMsg.Enemy_Now))
+        {
+            Round_Message.RMsg.Enemy_Now = manager.Get_Enemy_Data(Round_Message.RMsg.enemy_instances[0]);
+            Flash_pos();
+        }
         //判断游戏是否结束
         if (Round_Message.RMsg.enemy_instances.Count <= 0)
         {
             Debug.Log("Win");
+            //清空战斗数据
+            manager.Data_clear_combat();
             //退出战斗
             GameObject.Find("Manager").GetComponent<Btn_Controller>().Combat_Exit();
         }
         if (Round_Message.RMsg.Player.player_health <= 0)
         {
             Debug.Log("Loss");
+            //清空战斗数据
+            manager.Data_clear_combat();
             //退出战斗
             GameObject.Find("Manager").GetComponent<Btn_Controller>().Combat_Exit();
         }
     }
     #region 外部调用方法
-    //更新回合_Fight按钮
+    //Fight按钮
+    public void Select_Open()
+    {
+        foreach (string skills in Round_Message.RMsg.skill_action)
+        {
+            if (skills == "heart8" || skills == "heart10" || skills == "heartJ" || skills == "heartA" || skills == "clubA")
+                Round_Message.RMsg.select_action.Add(skills);
+        }
+        if (Round_Message.RMsg.select_action.Count > 0)
+            GameObject.Find("RoundManager").GetComponent<Extra_Select_Manager>().StartSelectTurn();
+        else
+            Next_round();
+    }
+    //更新回合
     public void Next_round()
     {
         //使用卡牌
@@ -221,11 +245,6 @@ public class Combat_System : MonoBehaviour
         manager.Drop_card();
         //减少出牌次数
         Round_Message.RMsg.Round ++;
-        // 判断当前怪物是否死亡
-        if (Round_Message.RMsg.enemy_instances.Count > 0 && manager.Death_enemy(Round_Message.RMsg.Enemy_Now))
-        {
-            Round_Message.RMsg.Enemy_Now = manager.Get_Enemy_Data(Round_Message.RMsg.enemy_instances[0]);
-        }
         Flash_pos();
         if (Round_Message.RMsg.Round >= Round_Message.RMsg.MaxRound) GameObject.Find("RoundManager").GetComponent<TurnManager>().EndPlayerTurn();
         else GameObject.Find("RoundManager").GetComponent<TurnManager>().StartNewTurn();

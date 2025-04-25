@@ -19,6 +19,8 @@ public class Round_Message
     public List<string> enemy_instances = new List<string>();//敌人实例
     public List<string> equipment_instances = new List<string>();//装备实例
 
+    public List<string> select_action = new List<string>();
+
     //最大手牌数
     int hand_in_card_num_max = 8;
     public int Hand_in_card_num_max { get => hand_in_card_num_max; set => hand_in_card_num_max = value; }
@@ -48,16 +50,19 @@ public class Round_Message
     //clubJ
     bool clubJ = false;
     public bool ClubJ { get => clubJ; set => clubJ = value; }
-
-    //当前选择的卡牌
-    int card_choose = 0;
-    public int Card_choose { get => card_choose; set => card_choose = value; }
     //当前选择怪物
     Enemy enemy_now = null;
     public Enemy Enemy_Now { get => enemy_now; set => enemy_now = value; }
+    //当前选择卡牌
+    string card_now = null;
+    public string Card_Now { get => card_now; set => card_now = value; }
     //玩家
     Player player = null;
     public Player Player { get => player; set => player = value; }
+
+    //是否阻塞
+    bool iscomplete = false;
+    public bool IsComplete { get => iscomplete; set => iscomplete = value; }
 
     private static Round_Message round_message;
     private Round_Message() { }
