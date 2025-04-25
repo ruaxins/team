@@ -41,3 +41,6 @@ dist/
 
 # 隐私文件
 Assets/StreamingAssets/token.txt
+Assembly-CSharp-Editor.csproj
+Assembly-CSharp-firstpass.csproj
+Assembly-CSharp.csproj
