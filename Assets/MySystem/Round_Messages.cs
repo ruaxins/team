@@ -47,9 +47,6 @@ public class Round_Message
     int maxdropround = 3;
     public int MaxDropRound { get => maxdropround; set => maxdropround = value; }
 
-    //clubJ
-    bool clubJ = false;
-    public bool ClubJ { get => clubJ; set => clubJ = value; }
     //当前选择怪物
     Enemy enemy_now = null;
     public Enemy Enemy_Now { get => enemy_now; set => enemy_now = value; }
