@@ -161,6 +161,67 @@ public class Game_Init : MonoBehaviour
         Register_Enemy_Object("fire_witch", Enemy_Create(), fire_witch);
         Register_Enemy_Object("fire_king", Enemy_Create(), fire_king);
         #endregion
+        #region Ñ¡Ôñ¿¨ÅÆÊµÀýÈë¿â
+        //¹¥»÷¿¨
+        Register_Select_Object("diamond3", Select_Create());
+        Register_Select_Object("diamond4", Select_Create());
+        Register_Select_Object("diamond5", Select_Create());
+        Register_Select_Object("diamond6", Select_Create());
+        Register_Select_Object("diamond7", Select_Create());
+        Register_Select_Object("diamond8", Select_Create());
+        Register_Select_Object("diamond9", Select_Create());
+        Register_Select_Object("diamond10", Select_Create());
+        Register_Select_Object("diamondJ", Select_Create());
+        Register_Select_Object("diamondQ", Select_Create());
+        Register_Select_Object("diamondK", Select_Create());
+        Register_Select_Object("diamondA", Select_Create());
+        //·ÀÓù¿¨
+        Register_Select_Object("spade3", Select_Create());
+        Register_Select_Object("spade4", Select_Create());
+        Register_Select_Object("spade5", Select_Create());
+        Register_Select_Object("spade6", Select_Create());
+        Register_Select_Object("spade7", Select_Create());
+        Register_Select_Object("spade8", Select_Create());
+        Register_Select_Object("spade9", Select_Create());
+        Register_Select_Object("spade10", Select_Create());
+        Register_Select_Object("spadeJ", Select_Create());
+        Register_Select_Object("spadeQ", Select_Create());
+        Register_Select_Object("spadeK", Select_Create());
+        Register_Select_Object("spadeA", Select_Create());
+        //×°±¸¿¨
+        Register_Select_Object("club3", Select_Create());
+        Register_Select_Object("club4", Select_Create());
+        Register_Select_Object("club5", Select_Create());
+        Register_Select_Object("club6", Select_Create());
+        Register_Select_Object("club7", Select_Create());
+        Register_Select_Object("club8", Select_Create());
+        Register_Select_Object("club9", Select_Create());
+        Register_Select_Object("club10", Select_Create());
+        Register_Select_Object("clubJ", Select_Create());
+        Register_Select_Object("clubQ", Select_Create());
+        Register_Select_Object("clubK", Select_Create());
+        Register_Select_Object("clubA", Select_Create());
+        //×çÖä¿¨
+        Register_Select_Object("curse1", Select_Create());
+        Register_Select_Object("curse2", Select_Create());
+        Register_Select_Object("curse3", Select_Create());
+        Register_Select_Object("curse4", Select_Create());
+        Register_Select_Object("curse5", Select_Create());
+        //¼¼ÄÜ¿¨
+        Register_Select_Object("heart3", Select_Create());
+        Register_Select_Object("heart4", Select_Create());
+        Register_Select_Object("heart5", Select_Create());
+        Register_Select_Object("heart6", Select_Create());
+        Register_Select_Object("heart7", Select_Create());
+        Register_Select_Object("heart8", Select_Create());
+        Register_Select_Object("heart9", Select_Create());
+        Register_Select_Object("heart10", Select_Create());
+        Register_Select_Object("heartJ", Select_Create());
+        Register_Select_Object("heartQ", Select_Create());
+        Register_Select_Object("heartK", Select_Create());
+        Register_Select_Object("heartA", Select_Create());
+
+        #endregion
     }
     GameObject Card_Create()
     {
@@ -175,6 +236,13 @@ public class Game_Init : MonoBehaviour
         GameObject enemy = Instantiate(prefab, transform);
         enemy.SetActive(false);
         return enemy;
+    }
+    GameObject Select_Create()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/select");
+        GameObject select = Instantiate(prefab, transform);
+        select.SetActive(false);
+        return select;
     }
     void Register_Card_Object(string type, GameObject obj, Card card)
     {
@@ -207,6 +275,17 @@ public class Game_Init : MonoBehaviour
         obj.GetComponent<Button>().onClick.AddListener(() =>
         {
             manager.OnEnemyClick(type);
+        });
+    }
+    void Register_Select_Object(string type, GameObject obj)
+    {
+        if (!Message.Msg.instance_select.ContainsKey(type))
+        {
+            Message.Msg.instance_select.Add(type, obj);
+        }
+        obj.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            manager.Get_Now_Card(obj);
         });
     }
 }

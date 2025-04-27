@@ -12,11 +12,23 @@ public class Bank_Manager : MonoBehaviour
         Get_Card("diamond5");
         Get_Card("diamond6");
         Get_Card("diamond7");
+        Get_Card("diamond8");
+        Get_Card("diamond9");
+
+        Get_Card("heart8");
+        Get_Card("heartJ");
+
         Get_Card("spade3");
         Get_Card("spade4");
         Get_Card("spade5");
         Get_Card("spade6");
         Get_Card("spade7");
+        Get_Card("spade8");
+        Get_Card("spade9");
+
+        Get_Equipement("club3");
+
+        Get_Equipement("curse1");
 
         Get_Enemy("fire_ghost");
         Get_Enemy("fire_insect");
@@ -29,5 +41,9 @@ public class Bank_Manager : MonoBehaviour
     void Get_Enemy(string type)
     {
         manager.Get_Enemy_Outside(type);
+    }
+    void Get_Equipement(string type)
+    {
+        manager.Get_Equipement_Outside(type);
     }
 }

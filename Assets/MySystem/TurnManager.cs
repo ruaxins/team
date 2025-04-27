@@ -12,7 +12,8 @@ public class TurnManager : MonoBehaviour
     {
         PlayerTurn,
         EnemyTurn,
-        TurnEnd
+        TurnEnd,
+        SelectTurn
     }
 
     public TurnPhase CurrentPhase { get; private set; }
@@ -47,7 +48,7 @@ public class TurnManager : MonoBehaviour
         screen.SetActive(false);
         // 玩家回合开始逻辑
         Debug.Log("玩家回合开始");
-        manager.Data_clear_player(Round_Message.RMsg.Player, false);
+        manager.Data_clear_round();
         //从牌库补充卡牌至上限
         if (Round_Message.RMsg.hand_in_instances.Count < Round_Message.RMsg.Hand_in_card_num_max)
             for (int i = Round_Message.RMsg.hand_in_instances.Count; i < Round_Message.RMsg.Hand_in_card_num_max; i++)
@@ -71,9 +72,7 @@ public class TurnManager : MonoBehaviour
         Debug.Log("回合结束阶段");
         Round_Message.RMsg.Player.player_health -= (int)(Round_Message.RMsg.Player.player_health * 0.05f * Round_Message.RMsg.Player.player_hurt);
         //数据清空
-        manager.Data_clear_player(Round_Message.RMsg.Player, true);
-        manager.Data_clear_enemy(Round_Message.RMsg.Enemy_Now);
-        manager.Data_clear_card();
+        manager.Data_clear_endround();
         // 开始新回合
         StartNewTurn();
     }
