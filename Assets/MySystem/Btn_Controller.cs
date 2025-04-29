@@ -26,6 +26,11 @@ public class Btn_Controller : MonoBehaviour
     Skills skill = new Skills();
     void Start()
     {
+        if (round_manager == null)
+        {
+            round_manager = GameObject.Find("RoundManager");
+            // 或者 GetComponent 也可以，看你的设计
+        }
     }
     void Update()
     {

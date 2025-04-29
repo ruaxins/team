@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Assets\c#\forcamera.cs" />
     <Compile Include="Assets\c#\forhp.cs" />
-    <Compile Include="Assets\test641.cs" />
     <Compile Include="Assets\MySystem\Combat_System.cs" />
     <Compile Include="Assets\Ciconia Studio\_Shared Files\Scripts\Demo\UIButton_ShowNext.cs" />
     <Compile Include="Assets\MySystem\Round_Messages.cs" />
