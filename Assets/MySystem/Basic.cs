@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using static Extra_Select_Manager;
 using static UnityEngine.EventSystems.EventTrigger;
 
@@ -97,7 +100,7 @@ public class Skills
     void Heart3(Player player, Enemy enemy)
     {
         //玩家伤害点数翻倍
-        player.scale *= 2;
+        player.scale_temp *= 2;
     }
     void Heart4(Player player, Enemy enemy)
     {
@@ -206,7 +209,7 @@ public class Skills
     public void Club9(Player player, Enemy enemy)
     {
         //出牌触发
-        if (Round_Message.RMsg.hand_out_instances.Count == 4) player.scale *= 2;
+        if (Round_Message.RMsg.hand_out_instances.Count == 4) player.scale_temp *= 2;
     }
     public void Club10(Player player, Enemy enemy)
     {
@@ -217,12 +220,11 @@ public class Skills
     public void ClubJ(Player player, Enemy enemy)
     {
         //出牌触发
-        Round_Message.RMsg.ClubJ = true;
     }
     public void ClubQ(Player player, Enemy enemy)
     {
         //出牌触发
-        if (Round_Message.RMsg.hand_out_instances.Count <= 3) player.scale *= 3;
+        if (Round_Message.RMsg.hand_out_instances.Count <= 3) player.scale_temp *= 3;
     }
     public void ClubK(Player player, Enemy enemy)
     {
@@ -240,13 +242,10 @@ public class Skills
     public void Curse1(Player player, Enemy enemy)
     {
         //计算点数触发
-        
     }
     public void Curse2(Player player, Enemy enemy)
     {
         //计算点数触发
-        player.player_attack_point /= 2;
-        player.player_armor_point /= 2;
     }
     public void Curse3(Player player, Enemy enemy)
     {
@@ -294,7 +293,6 @@ public class Skills
         }
         enemy.enemy_have_armor = true;
     }
-
     //从牌库选择指定卡牌
     public void Heart8_plus(Player player, Enemy enemy)
     {
@@ -349,6 +347,7 @@ public class Skills
 public class Enemy
 {
     Manager manager = new Manager();
+    Skills skill = new Skills();
     System.Random random = new System.Random();
     //怪物的属性
     public int enemy_health;
@@ -400,6 +399,7 @@ public class Enemy
     public void Attack_mode_0(Player player, Enemy enemy)
     {
         manager.Get_hurt_player(player, enemy);
+        if (manager.Search_equipment("club6")) skill.Get_skills("club6", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
     }
     public void Attack_mode_1(Player player, Enemy enemy)
     {
@@ -470,6 +470,8 @@ public class Player
     public int player_hurt = 0;
 
     public int scale = 1;
+
+    public int scale_temp = 1;
     public Player() { }
     public Player(int player_health)
     {
@@ -512,6 +514,7 @@ public class Manager
         }
         Debug.Log("can not found card");
     }
+    //单击敌人
     public void OnEnemyClick(string type)
     {
         if (Round_Message.RMsg.enemy_instances.Contains(type))
@@ -535,7 +538,8 @@ public class Manager
         else
         {
             Round_Message.RMsg.hand_out_instances.Add(type);
-        }
+            Round_Message.RMsg.skill_action.Add(type);
+            }
         Round_Message.RMsg.hand_in_instances.Remove(type);
     }
     //取消选择手牌
@@ -543,6 +547,7 @@ public class Manager
     {
         Round_Message.RMsg.hand_in_instances.Add(type);
         Round_Message.RMsg.hand_out_instances.Remove(type);
+        Round_Message.RMsg.skill_action.Remove(type);
     }
     //获取选择实例
     public GameObject Get_Select_Instance(string type)
@@ -599,9 +604,24 @@ public class Manager
             Card card = Get_Card_Data(type);
             switch (card.type)
             {
-                case "diamond": player_attack_point += (card.point + card.point_temp); break;
-                case "spade": player_armor_point += (card.point + card.point_temp); break;
-                case "heart":if (!Round_Message.RMsg.skill_action.Contains(type)) Round_Message.RMsg.skill_action.Add(type);break;
+                case "diamond":
+                    if (Search_equipment("curse2"))
+                        card.point_temp = -(card.point/2);
+                    if (Search_equipment("curse1"))
+                        if (card.point_show == "J" || card.point_show == "Q" || card.point_show == "K" || card.point_show == "A")
+                            card.point_temp = -card.point;
+
+                    player_attack_point += (card.point + card.point_temp); 
+                    break;
+                case "spade":
+                    if (Search_equipment("curse2"))
+                        card.point_temp = -(card.point / 2);
+                    if (Search_equipment("curse1"))
+                        if (card.point_show == "J" || card.point_show == "Q" || card.point_show == "K" || card.point_show == "A")
+                            card.point_temp = -card.point;
+
+                    player_armor_point += (card.point + card.point_temp); 
+                    break;
                 default:
                     break;
             }
@@ -612,65 +632,77 @@ public class Manager
     //获取卡牌组合
     public void Get_card_combination(Player player)
     {
+        int temp_scale = 1;
         List<int> weights = new List<int>();
-        List<string> types = new List<string>();
-        //排序
+        List<Card> cards = new List<Card>();
+        //分类
         foreach (string type in Round_Message.RMsg.hand_out_instances)
         {
             Card card = Get_Card_Data(type);
             weights.Add(card.weight);
-            types.Add(card.type);
+            cards.Add(card);
         }
-        for (int i = 1; i < weights.Count; i++)
+        //根据点数分组
+        var rankGroups = cards.GroupBy(c => c.weight)
+             .OrderByDescending(g => g.Count())
+             .ToList();
+        //去重排序
+        var distinctRanks = cards.Select(c => c.weight)
+             .Distinct()
+             .OrderBy(r => r)
+             .ToList();
+        var sanmelist = cards.GroupBy (c => c.type)
+             .OrderByDescending(g => g.Count())
+             .ToList();
+        //判断是否为顺子
+        bool isStraight = false;
+        if (!Search_equipment("clubJ"))
         {
-            int current = weights[i];
-            string curr = types[i];
-            int j = i - 1;
-            while (j >= 0 && weights[j] > current)
-            {
-                weights[j + 1] = weights[j];
-                types[j + 1] = types[j];
-                j--;
-            }
-            weights[j + 1] = current;
-            types[j + 1] = curr;
+            if (distinctRanks.Count >= 5)
+                if (distinctRanks[4] - distinctRanks[0] == 4) isStraight = true;
         }
-        //判断
-        int temp = 0;
-        string temp_ = null;
-        int temp_num = 1;
-        int temp_type = 1;
-        int temp_scale = 1;
-        int temp_straight = 1;
-        foreach (int weight in weights)
+        else
         {
-            if (temp != 0)
-            {
-                if (weight == temp + 1) temp_straight++;
-                if (weight == temp) temp_num++;
-                else temp = weight;
-            }
-            else temp = weight;
-        }
-        foreach (string type in types)
-        {
-            if (temp_ != null)
-            {
-                if (type == temp_) temp_type++;
-            }
-            else temp_ = type;
+            if (distinctRanks.Count == 4)
+                if (distinctRanks[3] - distinctRanks[0] == 3) isStraight = true;
+            else if (distinctRanks.Count == 5)
+                if (distinctRanks[3] - distinctRanks[0] == 3 || distinctRanks[4] - distinctRanks[1] == 3) isStraight = true;
         }
 
-        if (Round_Message.RMsg.ClubJ) temp_straight++;
+        //判断是否为同花
+        bool isFlush = false;
+        if (sanmelist.Count == 1)
+            if (sanmelist[0].Count() == 5)
+                isFlush = true;
+        //判断是否为葫芦
+        bool isFullHouse = false;
+        if (rankGroups.Count >= 2)
+            if (rankGroups.Count >= 2 && rankGroups[0].Count() >= 3 && rankGroups[1].Count() >= 2)
+                isFullHouse = true;
+        //判断是否为三条
+        bool isThreeOfKind = false;
+        if (rankGroups.Count >= 1)
+            if (rankGroups[0].Count() >= 3)
+                isThreeOfKind = true;
+        //判断是否为两对
+        bool isTwoPair = false;
+        if (rankGroups.Count >= 2)
+            if (rankGroups[0].Count() == 2 && rankGroups[1].Count() == 2)
+                isTwoPair = true;
+        //判断是否为对子
+        bool isOnePair = false;
+        if (rankGroups.Count >= 1)
+            if (rankGroups[0].Count() == 2)
+                isOnePair = true;
 
-        if (temp_num == 1) temp_scale = 1;//单牌
-        if (temp_num == 2) temp_scale = 3;//对子
-        if (temp_num == 3) temp_scale = 4;//三条
-        if (temp_num == 3) temp_scale = 4;//两对
-        if (temp_type == 5) temp_scale = 5;//同花
-        if (temp_straight == 5) temp_scale = 5;//顺子
-        if (temp_num == 4) temp_scale = 6;//葫芦
-        if (temp_type == 5 && temp_straight == 5) temp_scale = 8;//同花顺
+        if (isFlush && isStraight) temp_scale = 8;//同花顺
+        else if (isFullHouse) temp_scale = 6;//葫芦
+        else if (isStraight) temp_scale = 5;//顺子
+        else if (isFlush) temp_scale = 5;//同花
+        else if (isThreeOfKind) temp_scale = 4;//三条
+        else if (isTwoPair) temp_scale = 4;//两对
+        else if (isOnePair) temp_scale = 3;//对子
+        else temp_scale = 1;//单牌
 
         player.scale = temp_scale;
     }
@@ -682,9 +714,9 @@ public class Manager
         //计算抵挡层数带来的护甲值加成
         player.player_armor_point += (player.player_armor_point * 0.05f * player.player_hold);
         //计算牌型带来的结算倍数
-        player.player_attack_point *= player.scale;
-        player.player_skill_point *= player.scale;
-        player.player_armor_point_origin += (player.player_armor_point * player.scale);
+        player.player_attack_point *= (player.scale * player.scale_temp);
+        player.player_skill_point *= (player.scale * player.scale_temp);
+        player.player_armor_point_origin += (player.player_armor_point * player.scale * player.scale_temp);
         //判断是否穿透护甲
         if (enemy.enemy_have_armor)
         {
@@ -828,6 +860,7 @@ public class Manager
         Round_Message.RMsg.Player.player_skill_point = 0;
         Round_Message.RMsg.Player.player_armor_point = 0;
         Round_Message.RMsg.Player.scale = 1;
+        Round_Message.RMsg.Player.scale_temp = 1;
 
         Round_Message.RMsg.skill_action.Clear();
 
@@ -841,6 +874,7 @@ public class Manager
         Round_Message.RMsg.Player.player_skill_point = 0;
         Round_Message.RMsg.Player.player_armor_point = 0;
         Round_Message.RMsg.Player.scale = 1;
+        Round_Message.RMsg.Player.scale_temp = 1;
 
         Round_Message.RMsg.skill_action.Clear();
 

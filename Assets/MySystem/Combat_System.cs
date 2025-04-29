@@ -224,8 +224,12 @@ public class Combat_System : MonoBehaviour
         foreach (string skills in Round_Message.RMsg.skill_action)
         {
             if (skills == "heart8" || skills == "heart10" || skills == "heartJ" || skills == "heartA" || skills == "clubA")
+            {
                 Round_Message.RMsg.select_action.Add(skills);
+                Debug.Log("action add" + skills);
+            }
         }
+        Debug.Log("action count" + Round_Message.RMsg.select_action.Count);
         if (Round_Message.RMsg.select_action.Count > 0)
             GameObject.Find("RoundManager").GetComponent<Extra_Select_Manager>().StartSelectTurn();
         else
@@ -239,6 +243,11 @@ public class Combat_System : MonoBehaviour
         {
             skill.Get_skills(skills, Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
         }
+        //出牌触发
+        if (manager.Search_equipment("club7")) skill.Get_skills("club7", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("club9")) skill.Get_skills("club9", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("clubQ")) skill.Get_skills("clubQ", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("curse3")) skill.Get_skills("curse3", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
         //对当前敌人造成伤害
         manager.Get_hurt_ennemy(Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
         //弃牌
@@ -261,6 +270,7 @@ public class Combat_System : MonoBehaviour
             {
                 if (Round_Message.RMsg.hand_in_instances.Count <= 0) break;
                 manager.Get_card();
+                if (manager.Search_equipment("club10")) skill.Get_skills("club10", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
             }
         Flash_pos();
     }

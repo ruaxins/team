@@ -8,6 +8,7 @@ public class TurnManager : MonoBehaviour
 {
     GameObject screen;
     Manager manager = new Manager();
+    Skills skill = new Skills();
     public enum TurnPhase
     {
         PlayerTurn,
@@ -48,6 +49,19 @@ public class TurnManager : MonoBehaviour
         screen.SetActive(false);
         // 玩家回合开始逻辑
         Debug.Log("玩家回合开始");
+        //回合开始触发
+        if (manager.Search_equipment("club3")) skill.Get_skills("club3", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("club4")) skill.Get_skills("club4", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("club5")) skill.Get_skills("club5", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("club8")) skill.Get_skills("club8", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("curse4")) skill.Get_skills("curse4", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("curse5")) skill.Get_skills("curse5", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        if (manager.Search_equipment("clubA"))
+        {
+            Round_Message.RMsg.select_action.Add("clubA");
+            GameObject.Find("RoundManager").GetComponent<Extra_Select_Manager>().StartSelectTurn();
+        }
+        //
         manager.Data_clear_round();
         //从牌库补充卡牌至上限
         if (Round_Message.RMsg.hand_in_instances.Count < Round_Message.RMsg.Hand_in_card_num_max)
@@ -55,6 +69,7 @@ public class TurnManager : MonoBehaviour
             {
                 if (Round_Message.RMsg.bank_in_instances.Count <= 0) break;
                 manager.Get_card();
+                if (manager.Search_equipment("club10")) skill.Get_skills("club10", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
             }
         GameObject.Find("RoundManager").GetComponent<Combat_System>().Flash_pos();
     }
@@ -70,6 +85,14 @@ public class TurnManager : MonoBehaviour
     {
         // 回合结束逻辑
         Debug.Log("回合结束阶段");
+        //回合结束行动
+        foreach (string action in Round_Message.RMsg.round_end_action)
+        {
+            skill.Get_skills(action, Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        }
+        //回合结束触发
+        if (manager.Search_equipment("clubK")) skill.Get_skills("clubK", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
+        //计算自刃
         Round_Message.RMsg.Player.player_health -= (int)(Round_Message.RMsg.Player.player_health * 0.05f * Round_Message.RMsg.Player.player_hurt);
         //数据清空
         manager.Data_clear_endround();

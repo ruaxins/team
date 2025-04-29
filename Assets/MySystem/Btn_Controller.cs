@@ -118,7 +118,7 @@ public class Btn_Controller : MonoBehaviour
 
     public void End_Select()
     {
-        skill.Get_skills(Round_Message.RMsg.select_action[0] + "_plus");
+        skill.Get_skills(Round_Message.RMsg.select_action[0] + "_plus", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
         Return_Select();
     }
     public void Return_Select()
