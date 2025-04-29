@@ -22,6 +22,8 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
     public bool isInteractable = true;
     private int originalSiblingIndex;
 
+    Manager manager = new Manager();
+
     void Awake()
     {
         infoPanel = transform.Find("Detial").gameObject;
@@ -62,6 +64,13 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
     }
     string GetCardDescription()
     {
-        return "yes";
+        foreach (var type in Message.Msg.instance_card)
+        {
+            if (type.Value == gameObject)
+            {
+                return manager.Get_Card_Data(type.Key).skill_message;
+            }
+        }
+        return "No Message";
     }
 }
