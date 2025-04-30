@@ -47,6 +47,10 @@ public class Round_Message
     int maxdropround = 3;
     public int MaxDropRound { get => maxdropround; set => maxdropround = value; }
 
+    //当前召唤怪物
+    string enemy_call = null;
+    public string Enemy_Call { get => enemy_call; set => enemy_call = value; }
+
     //当前选择怪物
     Enemy enemy_now = null;
     public Enemy Enemy_Now { get => enemy_now; set => enemy_now = value; }

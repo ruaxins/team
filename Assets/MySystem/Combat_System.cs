@@ -181,7 +181,6 @@ public class Combat_System : MonoBehaviour
                 break;
             }
         }
-        
         //计算牌型组合和玩家数值并显示
         if (Round_Message.RMsg.hand_in_instances.Count > 0)
         {

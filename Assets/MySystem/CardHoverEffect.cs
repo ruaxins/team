@@ -13,23 +13,11 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
     [SerializeField] private float animDuration = 0.5f;
     [SerializeField] private Ease easeType = Ease.OutBack;
 
-    [Header("信息显示")]
-    [SerializeField] private GameObject infoPanel;
-    [SerializeField] private Text descriptionText;
-
     public Vector2 originalPosition;
     public Vector2 originalScale;
     public bool isInteractable = true;
     private int originalSiblingIndex;
 
-    Manager manager = new Manager();
-
-    void Awake()
-    {
-        infoPanel = transform.Find("Detial").gameObject;
-        descriptionText = infoPanel.GetComponent<Text>();
-        infoPanel.SetActive(false);
-    }
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!isInteractable) return;
@@ -40,10 +28,6 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
         // 动画效果
         transform.DOScale(originalScale * hoverScale, animDuration).SetEase(easeType);
         transform.DOMoveY(originalPosition.y + hoverHeight, animDuration).SetEase(easeType);
-
-        // 显示信息面板
-        infoPanel.SetActive(true);
-        descriptionText.text = GetCardDescription(); // 自定义方法获取卡牌描述
 
         // 可选：播放音效
         //AudioManager.PlayHoverSound();
@@ -58,19 +42,5 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
 
         // 恢复层级
         transform.SetSiblingIndex(originalSiblingIndex);
-
-        // 隐藏信息面板
-        infoPanel.SetActive(false);
-    }
-    string GetCardDescription()
-    {
-        foreach (var type in Message.Msg.instance_card)
-        {
-            if (type.Value == gameObject)
-            {
-                return manager.Get_Card_Data(type.Key).skill_message;
-            }
-        }
-        return "No Message";
     }
 }

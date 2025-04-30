@@ -62,31 +62,88 @@ public class Game_Init : MonoBehaviour
         Card sK = new Card("spade", "K", 10, "防御力+10", 13);
         Card sA = new Card("spade", "A", 10, "防御力+10", 14);
 
-        Card z1 = new Card("curse", "1", 0, "null", 0);
-        Card z2 = new Card("curse", "2", 0, "null", 0);
-        Card z3 = new Card("curse", "3", 0, "null", 0);
-        Card z4 = new Card("curse", "4", 0, "null", 0);
-        Card z5 = new Card("curse", "5", 0, "null", 0);
+        Card z1 = new Card("curse", "1", 0, "本轮所有人头牌（J/Q/K/A）的攻击/防御点数=0", 0);
+        Card z2 = new Card("curse", "2", 0, "本轮所有攻击/防御牌点数×0.5", 0);
+        Card z3 = new Card("curse", "3", 0, "每次攻击敌人后，自身获得1层【自刃】", 0);
+        Card z4 = new Card("curse", "4", 0, "敌人获得2层【抵挡】", 0);
+        Card z5 = new Card("curse", "5", 0, "敌人获得2层【增强】", 0);
         #endregion
         #region 创建敌人实例
         //敌人攻击模式
         //0-造成攻击值伤害，1-两层增强，2-护甲+5，3-复制自身，4-获得扣血量的护甲，5-玩家一层自刃
         //6-失去一张手牌，7-护甲+15，8-玩家两层自刃，9-五层增强，10-四层抵挡
-        List<int> mode = new List<int>
+        List<int> mode0 = new List<int>
         {
+            //攻击，攻击，强化
             0,0,1
         };
+        List<int> mode1 = new List<int>
+        {
+            //攻击，防御
+            0,2
+        };
+        List<int> mode2 = new List<int>
+        {
+            //攻击，分裂
+            0
+        };
+        List<int> mode3 = new List<int>
+        {
+            //反弹，攻击
+            4,0
+        };
+        List<int> mode4 = new List<int>
+        {
+            //攻击，削弱
+            0,5
+        };
+        List<int> mode5 = new List<int>
+        {
+            //攻击，灼烧
+            0
+        };
+        List<int> mode6 = new List<int>
+        {
+            //攻击，强化
+            0,1
+        };
+        List<int> mode7 = new List<int>
+        {
+            //攻击，防御，灼烧
+            0,7,6
+        };
+        List<int> mode8 = new List<int>
+        {
+            //攻击，削弱，召唤
+            0,8
+        };
+        List<int> mode9 = new List<int>
+        {
+            //攻击，防御，狂暴，召唤
+            0,10,9
+        };
         //初始化敌人（血量，攻击值，护甲，攻击模式）
-        Enemy fire_ghost = new Enemy(30, 10, 5, mode);
-        Enemy fire_insect = new Enemy(40, 10, 5, mode);
-        Enemy fire_slime = new Enemy(50, 10, 5, mode);
-        Enemy fire_puppet = new Enemy(60, 10, 5, mode);
-        Enemy fire_specter = new Enemy(70, 10, 5, mode);
-        Enemy fire_dog = new Enemy(80, 10, 5, mode);
-        Enemy fire_knight = new Enemy(90, 10, 5, mode);
-        Enemy fire_monster = new Enemy(100, 10, 5, mode);
-        Enemy fire_witch = new Enemy(100, 10, 5, mode);
-        Enemy fire_king = new Enemy(100, 10, 5, mode);
+        Enemy fire_ghost = new Enemy("fire_ghost", 30, 10, 5, mode0);
+        Enemy fire_insect = new Enemy("fire_insect", 40, 10, 5, mode1);
+        Enemy fire_slime = new Enemy("fire_slime", 50, 10, 5, mode2);
+        Enemy fire_puppet = new Enemy("fire_puppet", 60, 10, 5, mode3);
+        Enemy fire_specter = new Enemy("fire_specter", 70, 10, 5, mode4);
+        Enemy fire_dog = new Enemy("fire_dog", 80, 10, 5, mode5);
+        Enemy fire_knight = new Enemy("fire_knight", 90, 10, 5, mode6);
+        Enemy fire_monster = new Enemy("fire_monster", 100, 10, 5, mode7);
+        Enemy fire_witch = new Enemy("fire_witch", 100, 10, 5, mode8);
+        Enemy fire_king = new Enemy("fire_king", 100, 10, 5, mode9);
+        //复制体
+        Enemy fire_ghost_copy = new Enemy("fire_ghost_copy", 30, 10, 5, mode0);
+        Enemy fire_insect_copy = new Enemy("fire_insect_copy", 40, 10, 5, mode1);
+        Enemy fire_slime_copy = new Enemy("fire_slime_copy", 50, 10, 5, mode2);
+        Enemy fire_puppet_copy = new Enemy("fire_puppet_copy", 60, 10, 5, mode3);
+        Enemy fire_specter_copy = new Enemy("fire_specter_copy", 70, 10, 5, mode4);
+        Enemy fire_dog_copy = new Enemy("fire_dog_copy", 80, 10, 5, mode5);
+        Enemy fire_knight_copy = new Enemy("fire_knight_copy", 90, 10, 5, mode6);
+        Enemy fire_monster_copy = new Enemy("fire_monster_copy", 100, 10, 5, mode7);
+        Enemy fire_witch_copy = new Enemy("fire_witch_copy", 100, 10, 5, mode8);
+        Enemy fire_king_copy = new Enemy("fire_king_copy", 100, 10, 5, mode9);
         #endregion
         #region 卡牌实例入库
         //攻击卡
@@ -160,6 +217,17 @@ public class Game_Init : MonoBehaviour
         Register_Enemy_Object("fire_monster", Enemy_Create(), fire_monster);
         Register_Enemy_Object("fire_witch", Enemy_Create(), fire_witch);
         Register_Enemy_Object("fire_king", Enemy_Create(), fire_king);
+        //复制体
+        Register_Enemy_Object("fire_ghost_copy", Enemy_Create(), fire_ghost_copy);
+        Register_Enemy_Object("fire_insect_copy", Enemy_Create(), fire_insect_copy);
+        Register_Enemy_Object("fire_slime_copy", Enemy_Create(), fire_slime_copy);
+        Register_Enemy_Object("fire_puppet_copy", Enemy_Create(), fire_puppet_copy);
+        Register_Enemy_Object("fire_specter_copy", Enemy_Create(), fire_specter_copy);
+        Register_Enemy_Object("fire_dog_copy", Enemy_Create(), fire_dog_copy);
+        Register_Enemy_Object("fire_knight_copy", Enemy_Create(), fire_knight_copy);
+        Register_Enemy_Object("fire_monster_copy", Enemy_Create(), fire_monster_copy);
+        Register_Enemy_Object("fire_witch_copy", Enemy_Create(), fire_witch_copy);
+        Register_Enemy_Object("fire_king_copy", Enemy_Create(), fire_king_copy);
         #endregion
         #region 选择卡牌实例入库
         //攻击卡
@@ -255,12 +323,15 @@ public class Game_Init : MonoBehaviour
         {
             Message.Msg.data_card.Add(type, card);
         }
+        obj.AddComponent<InfoManager>();
+        //判断是否为装备卡
         if (card.type == "club" || card.type == "curse") return;
         obj.GetComponent<Button>().onClick.AddListener(() =>
         {
             manager.OnCardClick(type);
         });
         obj.AddComponent<CardHoverEffect>();
+
     }
     void Register_Enemy_Object(string type, GameObject obj, Enemy enemy)
     {

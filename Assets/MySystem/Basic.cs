@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
+using UnityEngine.UIElements;
 using static Extra_Select_Manager;
 using static UnityEngine.EventSystems.EventTrigger;
 
@@ -350,11 +351,14 @@ public class Enemy
     Skills skill = new Skills();
     System.Random random = new System.Random();
     //怪物的属性
+    public string enemy_type;
     public int enemy_health;
+    public int enemy_health_max;
     public float enemy_attack_point = 0;
     public float enemy_armor_point = 0;
     public float enemy_get_hurt = 0;
     public bool enemy_have_armor = true;
+    public bool isSkillUsed = false;
 
     //增强
     public int enemy_enhance = 0;
@@ -367,9 +371,11 @@ public class Enemy
     public List<int> attack_mode_list;
 
     public Enemy() { }
-    public Enemy(int enemy_health, float enemy_attack_point, float enemy_armor_point, List<int> attack_mode_list)
+    public Enemy(string enemy_type, int enemy_health, float enemy_attack_point, float enemy_armor_point, List<int> attack_mode_list)
     {
+        this.enemy_type = enemy_type;
         this.enemy_health = enemy_health;
+        this.enemy_health_max = enemy_health;
         this.enemy_attack_point = enemy_attack_point;
         this.enemy_armor_point = enemy_armor_point;
         this.attack_mode_list = attack_mode_list;
@@ -377,12 +383,26 @@ public class Enemy
     #region 攻击模式
     public void Attack_mode_change(Player player, Enemy enemy)
     {
-        switch (attack_mode_list[attack_mode])
+        int action = attack_mode_list[attack_mode];
+        if (!isSkillUsed && enemy.enemy_health <= enemy.enemy_health_max/2)
+        {
+            switch (enemy.enemy_type)
+            {
+                case "fire_slime":Round_Message.RMsg.Enemy_Call = "fire_slime_copy"; break;
+                case "fire_dog": action = 6; break;
+                case "fire_witch":Round_Message.RMsg.Enemy_Call = "fire_specter_copy"; break;
+                case "fire_king":Round_Message.RMsg.Enemy_Call = "fire_specter_copy"; break;
+                default:
+                    break;
+            }
+            isSkillUsed = true;
+        }
+        switch (action)
         {
             case 0: Attack_mode_0(player, enemy); break;
             case 1: Attack_mode_1(player, enemy); break;
             case 2: Attack_mode_2(player, enemy); break;
-            case 3: Attack_mode_3(player, enemy); break;
+            case 3: break;
             case 4: Attack_mode_4(player, enemy); break;
             case 5: Attack_mode_5(player, enemy); break;
             case 6: Attack_mode_6(player, enemy); break;
@@ -391,6 +411,7 @@ public class Enemy
             case 9: Attack_mode_9(player, enemy); break;
             case 10: Attack_mode_10(player, enemy); break;
             default:
+                Debug.Log("can not find enemy mode");
                 break;
         }
         attack_mode++;
@@ -398,37 +419,43 @@ public class Enemy
     }
     public void Attack_mode_0(Player player, Enemy enemy)
     {
+        //攻击
         manager.Get_hurt_player(player, enemy);
         if (manager.Search_equipment("club6")) skill.Get_skills("club6", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
     }
     public void Attack_mode_1(Player player, Enemy enemy)
     {
-        enemy.enemy_attack_point += enemy.enemy_attack_point * 0.05f * 2;
+        //强化
+        enemy.enemy_enhance += 2;
     }
     public void Attack_mode_2(Player player, Enemy enemy)
     {
+        //防御
         enemy.enemy_armor_point += 5;
     }
-    public void Attack_mode_3(Player player, Enemy enemy)
+    public void Attack_mode_3(string calltype)
     {
-        if(!Round_Message.RMsg.enemy_instances.Contains("fire_ghost"))
-            Round_Message.RMsg.enemy_instances.Add("fire_ghost");
+        //召唤
+        if (!Round_Message.RMsg.enemy_instances.Contains(calltype)) Round_Message.RMsg.enemy_instances.Add(calltype);
+        else Debug.Log("call failed");
     }
     public void Attack_mode_4(Player player, Enemy enemy)
     {
+        //反弹
         if (enemy.enemy_get_hurt > 0)
         {
             enemy.enemy_armor_point += enemy.enemy_get_hurt;
-            //
+            player.player_health -= (int)(enemy.enemy_get_hurt * 0.05f);
         }
-
     }
     public void Attack_mode_5(Player player, Enemy enemy)
     {
-        player.player_health -= (int)(player.player_health * 0.05f);
+        //削弱
+        player.player_hurt ++;
     }
     public void Attack_mode_6(Player player, Enemy enemy)
     {
+        //灼烧
         int r = random.Next(0, Round_Message.RMsg.hand_in_instances.Count);
         Round_Message.RMsg.bank_out_instances.Add(Round_Message.RMsg.hand_in_instances[r]);
         Round_Message.RMsg.hand_in_instances.Remove(Round_Message.RMsg.hand_in_instances[r]);
@@ -439,15 +466,15 @@ public class Enemy
     }
     public void Attack_mode_8(Player player, Enemy enemy)
     {
-        player.player_health -= (int)(player.player_health * 0.05f) * 2;
+        player.player_hurt += 2;
     }
     public void Attack_mode_9(Player player, Enemy enemy)
     {
-        enemy.enemy_attack_point += enemy.enemy_attack_point * 0.05f * 5;
+        enemy.enemy_enhance += 5;
     }
     public void Attack_mode_10(Player player, Enemy enemy)
     {
-        enemy.enemy_armor_point += enemy.enemy_armor_point * 0.05f * 4;
+        enemy.enemy_hold += 4;
     }
     #endregion
 }
@@ -901,6 +928,32 @@ public class Manager
         {
             Get_Card_Data(type).point_temp = 0;
         }
+        foreach (string type in Message.Msg.enemy_in_instances)
+        {
+            Get_Enemy_Data(type).isSkillUsed = false;
+        }
+        Message.Msg.enemy_in_instances.Clear();
+
+        Round_Message.RMsg.round_end_action.Clear();
+        Round_Message.RMsg.skill_action.Clear();
+        Round_Message.RMsg.bank_in_instances.Clear();
+        Round_Message.RMsg.bank_out_instances.Clear();
+        Round_Message.RMsg.hand_in_instances.Clear();
+        Round_Message.RMsg.hand_out_instances.Clear();
+        Round_Message.RMsg.enemy_instances.Clear();
+        Round_Message.RMsg.equipment_instances.Clear();
+        Round_Message.RMsg.select_action.Clear();
+        Round_Message.RMsg.Hand_in_card_num = 0;
+        Round_Message.RMsg.Hand_in_card_num_max = 8;
+        Round_Message.RMsg.Hand_out_card_num = 0;
+        Round_Message.RMsg.Hand_out_card_num_max = 5;
+        Round_Message.RMsg.Round = 0;
+        Round_Message.RMsg.MaxRound = 3;
+        Round_Message.RMsg.DropRound = 0;
+        Round_Message.RMsg.MaxDropRound = 3;
+        Round_Message.RMsg.Enemy_Now = null;
+        Round_Message.RMsg.Card_Now = null;
+        Round_Message.RMsg.Player = null;
     }
     //获得当前选择卡牌
     public void Get_Now_Card(GameObject card)

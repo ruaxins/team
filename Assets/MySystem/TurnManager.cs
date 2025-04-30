@@ -4,8 +4,11 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
+// 声明带参数的委托类型
+public delegate void ParameterDelegate(string message);
 public class TurnManager : MonoBehaviour
 {
+    private ParameterDelegate multiDelegate;
     GameObject screen;
     Manager manager = new Manager();
     Skills skill = new Skills();
@@ -110,7 +113,11 @@ public class TurnManager : MonoBehaviour
         {
             yield return PerformAction(enemy);
         }
-
+        if (Round_Message.RMsg.Enemy_Call != null)
+        {
+            if (!Round_Message.RMsg.enemy_instances.Contains(Round_Message.RMsg.Enemy_Call)) Round_Message.RMsg.enemy_instances.Add(Round_Message.RMsg.Enemy_Call);
+            Round_Message.RMsg.Enemy_Call = null;
+        }
         // 怪物行动结束后
         EndEnemyTurn();
     }
