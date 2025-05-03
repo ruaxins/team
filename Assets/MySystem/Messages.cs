@@ -25,6 +25,15 @@ public class Message
     bool isLock = false;
     public bool IsLock { get => isLock; set => isLock = value; }
 
+
+    bool enable_x = false;
+    public bool Enable_x { get => enable_x; set => enable_x = value; }
+
+    bool enable_e = false;
+    public bool Enable_e { get => enable_e; set => enable_e = value; }
+
+    public GameObject Enemy = null;
+
     private static Message message;
     private Message() { }
     public static Message Msg

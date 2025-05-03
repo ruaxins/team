@@ -65,6 +65,10 @@ public class Round_Message
     bool iscomplete = false;
     public bool IsComplete { get => iscomplete; set => iscomplete = value; }
 
+    //ÈÜ½âÏµÊı
+    float dissolve = 0;
+    public float Dissolve { get => dissolve; set => dissolve = value; }
+
     private static Round_Message round_message;
     private Round_Message() { }
     public static Round_Message RMsg

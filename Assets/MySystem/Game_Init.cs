@@ -314,6 +314,12 @@ public class Game_Init : MonoBehaviour
     }
     void Register_Card_Object(string type, GameObject obj, Card card)
     {
+        string path = "Card/" + card.type + "/" + card.point_show;
+        Image image = obj.GetComponent<Image>();
+        Sprite sprite = Resources.Load<Sprite>(path);
+        if (sprite != null) image.sprite = sprite;
+        else Debug.Log("can not find sprite:" + path);
+
         Message.Msg.card_bank.Add(type);
         if (!Message.Msg.instance_card.ContainsKey(type))
         {

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static Extra_Select_Manager;
 
 public class Btn_Controller : MonoBehaviour
 {
@@ -12,14 +11,13 @@ public class Btn_Controller : MonoBehaviour
     public GameObject round_manager;
     public GameObject rule_box;
     public GameObject select_box;
+    public GameObject cover_box;
     public Button select_return;
     public Button select_end;
     public Button drop;
     public Button fight;
     public Button rules;
     public Button rule_exit;
-    public bool enable_x;
-    public bool enable_e;
     string state = null;
 
     Manager manager = new Manager();
@@ -34,18 +32,18 @@ public class Btn_Controller : MonoBehaviour
     }
     void Update()
     {
-        if (enable_e && Input .GetKeyDown(KeyCode.E))
+        if (Message.Msg.Enable_e && Input .GetKeyDown(KeyCode.E))
         {
             Message.Msg.IsLock = true;
             state = "interaction";
-            enable_e = false;
+            Message.Msg.Enable_e = false;
         }
-        if (enable_x && Input .GetKeyDown(KeyCode.X))
+        if (Message.Msg.Enable_x && Input .GetKeyDown(KeyCode.X))
         {
             Message.Msg.IsLock = true;
             state = "combat";
             combat_system.SetActive(true);
-            enable_x = false;
+            Message.Msg.Enable_x = false;
 
             Combat_Load();
         }
@@ -64,6 +62,12 @@ public class Btn_Controller : MonoBehaviour
     }
     public void Combat_Exit()
     {
+        fight.onClick.RemoveAllListeners();
+        drop.onClick.RemoveAllListeners();
+        select_return.onClick.RemoveAllListeners();
+        select_end.onClick.RemoveAllListeners();
+        rules.onClick.RemoveAllListeners();
+        rule_exit.onClick.RemoveAllListeners();
         Message.Msg.IsLock = false;
         state = null;    
         combat_exit.SetActive(false);
@@ -71,20 +75,30 @@ public class Btn_Controller : MonoBehaviour
         Destroy(round_manager.GetComponent<Combat_System>());
         Destroy(round_manager.GetComponent<TurnManager>());
         Destroy(round_manager.GetComponent<Extra_Select_Manager>());
+        Destroy(Message.Msg.Enemy);
+        Message.Msg.Enemy = null;
     }
+    public void WinGame()
+    {
 
+    }
+    public void LossGame()
+    {
+
+    }
     void Combat_Load()
     {
+        cover_box.SetActive(true);
         round_manager.AddComponent<Combat_System>();
         round_manager.AddComponent<TurnManager>();
         round_manager.AddComponent<Extra_Select_Manager>();
         fight.onClick.AddListener(() =>
         {
-            round_manager.GetComponent<Combat_System>().Select_Open();
+            round_manager.GetComponent<Combat_System>().Dissolve_Play();
         });
         drop.onClick.AddListener(() =>
         {
-            round_manager.GetComponent<Combat_System>().Drop();
+            round_manager.GetComponent<Combat_System>().Dissolve_Drop();
         });
         select_return.onClick.AddListener(() =>
         {
@@ -115,7 +129,6 @@ public class Btn_Controller : MonoBehaviour
     {
         rule_box.SetActive(false);
     }
-
     public void End_Select()
     {
         skill.Get_skills(Round_Message.RMsg.select_action[0] + "_plus", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);

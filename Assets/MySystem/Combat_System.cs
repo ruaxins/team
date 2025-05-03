@@ -43,7 +43,6 @@ public class Combat_System : MonoBehaviour
     };
     Skills skill = new Skills();
     Manager manager = new Manager();
-
     #endregion
     private void Start()
     {
@@ -100,13 +99,6 @@ public class Combat_System : MonoBehaviour
             instance.transform.localScale = new Vector2(1, 1);
             instance.GetComponent<CardHoverEffect>().originalPosition = instance.transform.position;
             instance.GetComponent<CardHoverEffect>().originalScale = new Vector2(1, 1);
-            Transform childTransform = instance.transform.Find("Name");
-            if (childTransform != null)
-            {
-                GameObject childObject = childTransform.gameObject;
-                // 使用子对象...
-                childObject.GetComponent<Text>().text = manager.Get_Card_Data(type).type + '\n' + manager.Get_Card_Data(type).point_show;
-            }
         }
         foreach (string type in Round_Message.RMsg.equipment_instances)
         {
@@ -119,14 +111,6 @@ public class Combat_System : MonoBehaviour
             // 设置位置（中心点坐标）
             int pos = Round_Message.RMsg.equipment_instances.IndexOf(type);
             rt.anchoredPosition = potision[pos];
-
-            Transform childTransform = instance.transform.Find("Name");
-            if (childTransform != null)
-            {
-                GameObject childObject = childTransform.gameObject;
-                // 使用子对象...
-                childObject.GetComponent<Text>().text = manager.Get_Card_Data(type).type + '\n' + manager.Get_Card_Data(type).point_show;
-            }
         }
         foreach (string type in Round_Message.RMsg.enemy_instances)
         {
@@ -193,7 +177,7 @@ public class Combat_System : MonoBehaviour
 
         gameround.text = Round_Message.RMsg.Round.ToString();
         // 判断当前怪物是否死亡
-        if (Round_Message.RMsg.enemy_instances.Count > 0 && manager.Death_enemy(Round_Message.RMsg.Enemy_Now))
+        if (manager.Death_enemy(Round_Message.RMsg.Enemy_Now) && Round_Message.RMsg.enemy_instances.Count > 0)
         {
             Round_Message.RMsg.Enemy_Now = manager.Get_Enemy_Data(Round_Message.RMsg.enemy_instances[0]);
             Flash_pos();
@@ -207,7 +191,7 @@ public class Combat_System : MonoBehaviour
             //退出战斗
             GameObject.Find("Manager").GetComponent<Btn_Controller>().Combat_Exit();
         }
-        if (Round_Message.RMsg.Player.player_health <= 0)
+        else if (Round_Message.RMsg.Player.player_health <= 0)
         {
             Debug.Log("Loss");
             //清空战斗数据
@@ -217,9 +201,34 @@ public class Combat_System : MonoBehaviour
         }
     }
     #region 外部调用方法
-    //Fight按钮
-    public void Select_Open()
+
+    //出牌按钮
+    public void Dissolve_Play()
     {
+        ResourceRequest request = Resources.LoadAsync<Material>("Shader/DissolveEffect");
+
+        foreach (string type in Round_Message.RMsg.hand_out_instances)
+        {
+            Image image = manager.Get_Card_Instances(type).GetComponent<Image>();
+            image.material = (Material)request.asset;
+        }
+
+        GameObject.Find("Manager").GetComponent<DIssolveController>().StartDissolve_Play();
+    }
+    public void Dissolve_Drop()
+    {
+        ResourceRequest request = Resources.LoadAsync<Material>("Shader/DissolveEffect");
+
+        foreach (string type in Round_Message.RMsg.hand_out_instances)
+        {
+            Image image = manager.Get_Card_Instances(type).GetComponent<Image>();
+            image.material = (Material)request.asset;
+        }
+
+        GameObject.Find("Manager").GetComponent<DIssolveController>().StartDissolve_Drop();
+    }
+    public void Select_Open()
+    { 
         foreach (string skills in Round_Message.RMsg.skill_action)
         {
             if (skills == "heart8" || skills == "heart10" || skills == "heartJ" || skills == "heartA" || skills == "clubA")

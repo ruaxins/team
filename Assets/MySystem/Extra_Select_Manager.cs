@@ -25,9 +25,6 @@ public class Extra_Select_Manager : MonoBehaviour
         new Vector2(-400, -180),
         new Vector2(-150, -180),
     };
-    private void Start()
-    {
-    }
     public void Flash()
     {
         if(Round_Message.RMsg.bank_in_instances.Count <= 0) return;

@@ -67,7 +67,7 @@ public class Bank_Manager : MonoBehaviour
 
         //Get_Enemy("fire_ghost");
         //Get_Enemy("fire_insect");
-        Get_Enemy("fire_slime");
+        //Get_Enemy("fire_slime");
         //Get_Enemy("fire_puppet");
         //Get_Enemy("fire_specter");
         //Get_Enemy("fire_dog");

@@ -1,14 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-using UnityEngine.UIElements;
-using static Extra_Select_Manager;
-using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.UI;
 
 public class Basic : MonoBehaviour
 { 
@@ -566,7 +560,7 @@ public class Manager
         {
             Round_Message.RMsg.hand_out_instances.Add(type);
             Round_Message.RMsg.skill_action.Add(type);
-            }
+        }
         Round_Message.RMsg.hand_in_instances.Remove(type);
     }
     //取消选择手牌
@@ -804,6 +798,23 @@ public class Manager
         if (Message.Msg.equipement_instance.Contains(type)) return;
         if (Get_Card_Data(type).type == "club") Message.Msg.equipement_instance.Add(type);
         if (Get_Card_Data(type).type == "curse") Message.Msg.equipement_instance.Insert(0, type);
+    }    
+    //在场景中移除敌人
+    public void Remove_Enemy_Outside(string type)
+    {
+        Message.Msg.enemy_in_instances.Remove(type);
+    }
+    //在场景中移除卡牌
+    public void Remove_Card_Outside(string type)
+    {
+        if (Message.Msg.bank_in_instances.Contains(type))
+            Message.Msg.bank_in_instances.Remove(type);
+    }
+    //在场景中移除装备牌
+    public void Remove_Equipement_Outside(string type)
+    {
+        if (Message.Msg.equipement_instance.Contains(type))
+            Message.Msg.equipement_instance.Remove(type);
     }
     //从牌库（弃牌堆）获得随机（指定）卡牌
     public void Get_card(bool place = true, string type = null)
@@ -850,6 +861,8 @@ public class Manager
     {
         foreach (string card in Round_Message.RMsg.hand_out_instances)
         {
+            Get_Card_Instances(card).GetComponent<Image>().material = null;
+
             Round_Message.RMsg.bank_out_instances.Add(card);
             Get_Card_Instances(card).GetComponent<CardHoverEffect>().isInteractable = true;
             Get_Card_Instances(card).transform.Find("Detial").gameObject.SetActive(false);
@@ -857,7 +870,7 @@ public class Manager
         }
         Round_Message.RMsg.hand_out_instances.Clear();
         Round_Message.RMsg.Hand_out_card_num = 0;
-
+        Round_Message.RMsg.skill_action.Clear();
     }
     //判断当前敌人是否死亡
     public bool Death_enemy(Enemy enemy)
@@ -932,6 +945,14 @@ public class Manager
         {
             Get_Enemy_Data(type).isSkillUsed = false;
         }
+        foreach (string type in Round_Message.RMsg.hand_in_instances)
+        {
+            Get_Card_Instances(type).SetActive(false);
+        }
+        foreach (string type in Message.Msg.bank_in_instances)
+        {            
+
+        }
         Message.Msg.enemy_in_instances.Clear();
 
         Round_Message.RMsg.round_end_action.Clear();
@@ -967,4 +988,5 @@ public class Manager
             }
         } 
     }
+
 }

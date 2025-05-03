@@ -62,13 +62,16 @@
   <ItemGroup>
     <Compile Include="Assets\c#\forcamera.cs" />
     <Compile Include="Assets\c#\forhp.cs" />
+    <Compile Include="Assets\MySystem\DIssolveController.cs" />
     <Compile Include="Assets\MySystem\InfoManager.cs" />
     <Compile Include="Assets\MySystem\Combat_System.cs" />
     <Compile Include="Assets\Ciconia Studio\_Shared Files\Scripts\Demo\UIButton_ShowNext.cs" />
     <Compile Include="Assets\MySystem\Round_Messages.cs" />
     <Compile Include="Assets\MySystem\CardHoverEffect.cs" />
     <Compile Include="Assets\c#\person.cs" />
+    <Compile Include="Assets\MySystem\EnemyController.cs" />
     <Compile Include="Assets\Ciconia Studio\_Shared Files\Scripts\Demo\FreeCam.cs" />
+    <Compile Include="Assets\MySystem\DoorController.cs" />
     <Compile Include="Assets\MySystem\Basic.cs" />
     <Compile Include="Assets\c#\buff.cs" />
     <Compile Include="Assets\MySystem\Messages.cs" />
@@ -92,6 +95,7 @@
     <None Include="Assets\Ciconia Studio\Shaders\Standard Shaders\BuiltIn\CS_Standard (Specular setup) Transparent.shader" />
     <None Include="Assets\Ciconia Studio\Shaders\Standard Shaders\BuiltIn\CS_Lite Standard (Specular setup) Transparent.shader" />
     <None Include="Assets\Ciconia Studio\Shaders\Standard Shaders\Readme.txt" />
+    <None Include="Assets\Resources\Shader\DissolveEffect.shader" />
     <None Include="Assets\Ciconia Studio\Shaders\Standard Shaders\BuiltIn\CS_Lite Standard (Specular setup) Opaque.shader" />
     <None Include="Assets\Ciconia Studio\Shaders\Standard Shaders\BuiltIn\CS_Lite Standard (Specular setup) Cutout.shader" />
     <None Include="Assets\Ciconia Studio\Shaders\Standard Shaders\BuiltIn\CS_Standard (Specular setup) Cutout.shader" />
