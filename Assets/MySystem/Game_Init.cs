@@ -62,11 +62,11 @@ public class Game_Init : MonoBehaviour
         Card sK = new Card("spade", "K", 10, "防御力+10", 13);
         Card sA = new Card("spade", "A", 10, "防御力+10", 14);
 
-        Card z1 = new Card("curse", "1", 0, "本轮所有人头牌（J/Q/K/A）的攻击/防御点数=0", 0);
-        Card z2 = new Card("curse", "2", 0, "本轮所有攻击/防御牌点数×0.5", 0);
-        Card z3 = new Card("curse", "3", 0, "每次攻击敌人后，自身获得1层【自刃】", 0);
-        Card z4 = new Card("curse", "4", 0, "敌人获得2层【抵挡】", 0);
-        Card z5 = new Card("curse", "5", 0, "敌人获得2层【增强】", 0);
+        Card z1 = new Card("curse", "0", 0, "本轮所有人头牌（J/Q/K/A）的攻击/防御点数=0", 0);
+        Card z2 = new Card("curse", "0", 0, "本轮所有攻击/防御牌点数×0.5", 0);
+        Card z3 = new Card("curse", "0", 0, "每次攻击敌人后，自身获得1层【自刃】", 0);
+        Card z4 = new Card("curse", "0", 0, "敌人获得2层【抵挡】", 0);
+        Card z5 = new Card("curse", "0", 0, "敌人获得2层【增强】", 0);
         #endregion
         #region 创建敌人实例
         //敌人攻击模式
@@ -123,27 +123,27 @@ public class Game_Init : MonoBehaviour
             0,10,9
         };
         //初始化敌人（血量，攻击值，护甲，攻击模式）
-        Enemy fire_ghost = new Enemy("fire_ghost", 30, 10, 5, mode0);
-        Enemy fire_insect = new Enemy("fire_insect", 40, 10, 5, mode1);
-        Enemy fire_slime = new Enemy("fire_slime", 50, 10, 5, mode2);
-        Enemy fire_puppet = new Enemy("fire_puppet", 60, 10, 5, mode3);
-        Enemy fire_specter = new Enemy("fire_specter", 70, 10, 5, mode4);
-        Enemy fire_dog = new Enemy("fire_dog", 80, 10, 5, mode5);
-        Enemy fire_knight = new Enemy("fire_knight", 90, 10, 5, mode6);
-        Enemy fire_monster = new Enemy("fire_monster", 100, 10, 5, mode7);
-        Enemy fire_witch = new Enemy("fire_witch", 100, 10, 5, mode8);
-        Enemy fire_king = new Enemy("fire_king", 100, 10, 5, mode9);
+        Enemy fire_ghost = new Enemy("S_Enemy", "fire_ghost", 30, 10, 5, mode0);
+        Enemy fire_insect = new Enemy("S_Enemy", "fire_insect", 40, 10, 5, mode1);
+        Enemy fire_slime = new Enemy("S_Enemy", "fire_slime", 50, 10, 5, mode2);
+        Enemy fire_puppet = new Enemy("S_Enemy", "fire_puppet", 60, 10, 5, mode3);
+        Enemy fire_specter = new Enemy("S_Enemy", "fire_specter", 70, 10, 5, mode4);
+        Enemy fire_dog = new Enemy("S_Enemy", "fire_dog", 80, 10, 5, mode5);
+        Enemy fire_knight = new Enemy("B_Enemy", "fire_knight", 90, 10, 5, mode6);
+        Enemy fire_monster = new Enemy("B_Enemy", "fire_monster", 100, 10, 5, mode7);
+        Enemy fire_witch = new Enemy("B_Enemy", "fire_witch", 100, 10, 5, mode8);
+        Enemy fire_king = new Enemy("Boss", "fire_king", 100, 10, 5, mode9);
         //复制体
-        Enemy fire_ghost_copy = new Enemy("fire_ghost_copy", 30, 10, 5, mode0);
-        Enemy fire_insect_copy = new Enemy("fire_insect_copy", 40, 10, 5, mode1);
-        Enemy fire_slime_copy = new Enemy("fire_slime_copy", 50, 10, 5, mode2);
-        Enemy fire_puppet_copy = new Enemy("fire_puppet_copy", 60, 10, 5, mode3);
-        Enemy fire_specter_copy = new Enemy("fire_specter_copy", 70, 10, 5, mode4);
-        Enemy fire_dog_copy = new Enemy("fire_dog_copy", 80, 10, 5, mode5);
-        Enemy fire_knight_copy = new Enemy("fire_knight_copy", 90, 10, 5, mode6);
-        Enemy fire_monster_copy = new Enemy("fire_monster_copy", 100, 10, 5, mode7);
-        Enemy fire_witch_copy = new Enemy("fire_witch_copy", 100, 10, 5, mode8);
-        Enemy fire_king_copy = new Enemy("fire_king_copy", 100, 10, 5, mode9);
+        Enemy fire_ghost_copy = new Enemy("S_Enemy", "fire_ghost_copy", 30, 10, 5, mode0);
+        Enemy fire_insect_copy = new Enemy("S_Enemy", "fire_insect_copy", 40, 10, 5, mode1);
+        Enemy fire_slime_copy = new Enemy("S_Enemy  ", "fire_slime_copy", 50, 10, 5, mode2);
+        Enemy fire_puppet_copy = new Enemy("S_Enemy", "fire_puppet_copy", 60, 10, 5, mode3);
+        Enemy fire_specter_copy = new Enemy("S_Enemy", "fire_specter_copy", 70, 10, 5, mode4);
+        Enemy fire_dog_copy = new Enemy("S_Enemy", "fire_dog_copy", 80, 10, 5, mode5);
+        Enemy fire_knight_copy = new Enemy("B_Enemy", "fire_knight_copy", 90, 10, 5, mode6);
+        Enemy fire_monster_copy = new Enemy("B_Enemy", "fire_monster_copy", 100, 10, 5, mode7);
+        Enemy fire_witch_copy = new Enemy("B_Enemy", "fire_witch_copy", 100, 10, 5, mode8);
+        Enemy fire_king_copy = new Enemy("Boss", "fire_king_copy", 100, 10, 5, mode9);
         #endregion
         #region 卡牌实例入库
         //攻击卡

@@ -344,7 +344,20 @@ public class Enemy
     Manager manager = new Manager();
     Skills skill = new Skills();
     System.Random random = new System.Random();
+    //原始数据
+    public int enemy_health_base;
+    public float enemy_attack_point_base;
+    public float enemy_armor_point_base;
+    public float enemy_get_hurt_base = 0;
+    public int attack_mode_base = 0;
+    public bool enemy_have_armor_base = true;
+    public bool isSkillUsed_base = false;
+    public int enemy_enhance_base = 0;
+    public int enemy_hold_base = 0;
+    public int enemy_hurt_base = 0;
+
     //怪物的属性
+    public string enemy_music; 
     public string enemy_type;
     public int enemy_health;
     public int enemy_health_max;
@@ -365,15 +378,34 @@ public class Enemy
     public List<int> attack_mode_list;
 
     public Enemy() { }
-    public Enemy(string enemy_type, int enemy_health, float enemy_attack_point, float enemy_armor_point, List<int> attack_mode_list)
+    public Enemy(string enemy_music, string enemy_type, int enemy_health, float enemy_attack_point, float enemy_armor_point, List<int> attack_mode_list)
     {
+        this.enemy_music = enemy_music;
         this.enemy_type = enemy_type;
         this.enemy_health = enemy_health;
         this.enemy_health_max = enemy_health;
         this.enemy_attack_point = enemy_attack_point;
         this.enemy_armor_point = enemy_armor_point;
         this.attack_mode_list = attack_mode_list;
+
+        enemy_health_base = enemy_health;
+        enemy_attack_point_base = enemy_attack_point;
+        enemy_armor_point_base = enemy_armor_point;
     }
+    //重置数据
+    public void FlushEnemy()
+    {
+        enemy_health = enemy_health_base;
+        enemy_attack_point = enemy_attack_point_base;
+        enemy_armor_point = enemy_armor_point_base;
+        enemy_get_hurt = enemy_get_hurt_base;
+        attack_mode = attack_mode_base;
+        enemy_have_armor = enemy_have_armor_base;
+        isSkillUsed = isSkillUsed_base;
+        enemy_enhance = enemy_enhance_base = 0;
+        enemy_hold = enemy_hold_base;
+        enemy_hurt = enemy_hurt_base;
+}
     #region 攻击模式
     public void Attack_mode_change(Player player, Enemy enemy)
     {
@@ -517,6 +549,7 @@ public class Manager
     //单击卡牌
     public void OnCardClick(string type)
     {
+        MusicEvent.Instance.ClickEventMusic();
         GameObject card = Get_Card_Instances(type);
         if (Round_Message.RMsg.hand_out_instances.Contains(type))
         {
@@ -538,6 +571,7 @@ public class Manager
     //单击敌人
     public void OnEnemyClick(string type)
     {
+        MusicEvent.Instance.ClickEventMusic();
         if (Round_Message.RMsg.enemy_instances.Contains(type))
         {
             Debug.Log("enemy change");
@@ -865,7 +899,8 @@ public class Manager
 
             Round_Message.RMsg.bank_out_instances.Add(card);
             Get_Card_Instances(card).GetComponent<CardHoverEffect>().isInteractable = true;
-            Get_Card_Instances(card).transform.Find("Detial").gameObject.SetActive(false);
+            Get_Card_Instances(card).transform.Find("Box").gameObject.SetActive(false);
+            Get_Card_Instances(card).transform.Find("Box_plus").gameObject.SetActive(false);
             Get_Card_Instances(card).SetActive(false);
         }
         Round_Message.RMsg.hand_out_instances.Clear();
@@ -886,6 +921,7 @@ public class Manager
                     break;
                 }
             }
+            enemy.FlushEnemy();
             Round_Message.RMsg.enemy_instances.Remove(s);
             Debug.Log("enemy died");
             return true;

@@ -30,7 +30,7 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
         transform.DOMoveY(originalPosition.y + hoverHeight, animDuration).SetEase(easeType);
 
         // 可选：播放音效
-        //AudioManager.PlayHoverSound();
+        MusicEvent.Instance.ShuffleEventMusic();
     }
     public void OnPointerExit(PointerEventData eventData)
     {

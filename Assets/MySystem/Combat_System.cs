@@ -11,7 +11,8 @@ public class Combat_System : MonoBehaviour
     GameObject equipement_list;
     GameObject enemy_list;
     GameObject enemy_select;
-    Text gameround;
+    Text handnum;
+    Text dropnum;
     Text card_combination;
     Text card_attack;
     Text card_defend;
@@ -58,7 +59,8 @@ public class Combat_System : MonoBehaviour
         equipement_list = GameObject.Find("equipement_list");
         enemy_list = GameObject.Find("enemy_list");
         enemy_select = GameObject.Find("Select_Enemy");
-        gameround = GameObject.Find("gameround").GetComponent<Text>();
+        handnum = GameObject.Find("HandNum").GetComponent<Text>();
+        dropnum = GameObject.Find("DropNum").GetComponent<Text>();
         card_combination = GameObject.Find("combination").GetComponent<Text>();
         card_attack = GameObject.Find("attack").GetComponent<Text>();
         card_defend = GameObject.Find("defend").GetComponent<Text>();
@@ -175,7 +177,8 @@ public class Combat_System : MonoBehaviour
         card_attack.text = "玩家攻击值：" + Round_Message.RMsg.Player.player_attack_point.ToString();
         card_defend.text = "玩家护甲值：" + Round_Message.RMsg.Player.player_armor_point_origin.ToString();
 
-        gameround.text = Round_Message.RMsg.Round.ToString();
+        handnum.text = "剩余出牌次数：" + (3 - Round_Message.RMsg.Round).ToString();
+        dropnum.text = "剩余弃牌次数：" + (3 - Round_Message.RMsg.DropRound).ToString();
         // 判断当前怪物是否死亡
         if (manager.Death_enemy(Round_Message.RMsg.Enemy_Now) && Round_Message.RMsg.enemy_instances.Count > 0)
         {
@@ -186,18 +189,14 @@ public class Combat_System : MonoBehaviour
         if (Round_Message.RMsg.enemy_instances.Count <= 0)
         {
             Debug.Log("Win");
-            //清空战斗数据
-            manager.Data_clear_combat();
             //退出战斗
-            GameObject.Find("Manager").GetComponent<Btn_Controller>().Combat_Exit();
+            GameObject.Find("Manager").GetComponent<Btn_Controller>().WinGame();
         }
         else if (Round_Message.RMsg.Player.player_health <= 0)
         {
             Debug.Log("Loss");
-            //清空战斗数据
-            manager.Data_clear_combat();
             //退出战斗
-            GameObject.Find("Manager").GetComponent<Btn_Controller>().Combat_Exit();
+            GameObject.Find("Manager").GetComponent<Btn_Controller>().LossGame();
         }
     }
     #region 外部调用方法
@@ -205,6 +204,8 @@ public class Combat_System : MonoBehaviour
     //出牌按钮
     public void Dissolve_Play()
     {
+        MusicEvent.Instance.ClickEventMusic();
+        GameObject.Find("Fight").GetComponent<Button>().enabled = false;
         ResourceRequest request = Resources.LoadAsync<Material>("Shader/DissolveEffect");
 
         foreach (string type in Round_Message.RMsg.hand_out_instances)
@@ -215,8 +216,11 @@ public class Combat_System : MonoBehaviour
 
         GameObject.Find("Manager").GetComponent<DIssolveController>().StartDissolve_Play();
     }
+    //弃牌按钮
     public void Dissolve_Drop()
     {
+        MusicEvent.Instance.ClickEventMusic();
+        GameObject.Find("Drop").GetComponent<Button>().enabled = false;
         ResourceRequest request = Resources.LoadAsync<Material>("Shader/DissolveEffect");
 
         foreach (string type in Round_Message.RMsg.hand_out_instances)
@@ -280,6 +284,7 @@ public class Combat_System : MonoBehaviour
                 manager.Get_card();
                 if (manager.Search_equipment("club10")) skill.Get_skills("club10", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
             }
+        GameObject.Find("Drop").GetComponent<Button>().enabled = true;
         Flash_pos();
     }
     #endregion

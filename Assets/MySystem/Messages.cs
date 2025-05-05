@@ -31,8 +31,11 @@ public class Message
 
     bool enable_e = false;
     public bool Enable_e { get => enable_e; set => enable_e = value; }
-
+    //场景内敌人实例
     public GameObject Enemy = null;
+    //背景音乐
+    public AudioClip backclip = null;
+
 
     private static Message message;
     private Message() { }

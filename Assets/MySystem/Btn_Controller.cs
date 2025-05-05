@@ -62,6 +62,13 @@ public class Btn_Controller : MonoBehaviour
     }
     public void Combat_Exit()
     {
+        foreach (string enemy in Message.Msg.enemy_in_instances)
+        {
+            manager.Get_Enemy_Data(enemy).FlushEnemy();
+        }
+        //清空战斗数据
+        manager.Data_clear_combat();
+        MusicController.Instance.ChangeBackgroundMusic(Message.Msg.backclip);
         fight.onClick.RemoveAllListeners();
         drop.onClick.RemoveAllListeners();
         select_return.onClick.RemoveAllListeners();
@@ -75,19 +82,58 @@ public class Btn_Controller : MonoBehaviour
         Destroy(round_manager.GetComponent<Combat_System>());
         Destroy(round_manager.GetComponent<TurnManager>());
         Destroy(round_manager.GetComponent<Extra_Select_Manager>());
-        Destroy(Message.Msg.Enemy);
+        //Destroy(Message.Msg.Enemy);
         Message.Msg.Enemy = null;
     }
     public void WinGame()
     {
-
+        //清空战斗数据
+        manager.Data_clear_combat();
+        fight.onClick.RemoveAllListeners();
+        drop.onClick.RemoveAllListeners();
+        select_return.onClick.RemoveAllListeners();
+        select_end.onClick.RemoveAllListeners();
+        rules.onClick.RemoveAllListeners();
+        rule_exit.onClick.RemoveAllListeners();
+        Message.Msg.IsLock = false;
+        state = null;
+        combat_exit.SetActive(false);
+        combat_system.SetActive(false);
+        Destroy(round_manager.GetComponent<Combat_System>());
+        Destroy(round_manager.GetComponent<TurnManager>());
+        Destroy(round_manager.GetComponent<Extra_Select_Manager>());
+        Destroy(Message.Msg.Enemy);
+        Message.Msg.Enemy = null;
     }
     public void LossGame()
     {
-
+        foreach (string enemy in Message.Msg.enemy_in_instances)
+        {
+            manager.Get_Enemy_Data(enemy).FlushEnemy();
+        }
+        //清空战斗数据
+        manager.Data_clear_combat();
+        fight.onClick.RemoveAllListeners();
+        drop.onClick.RemoveAllListeners();
+        select_return.onClick.RemoveAllListeners();
+        select_end.onClick.RemoveAllListeners();
+        rules.onClick.RemoveAllListeners();
+        rule_exit.onClick.RemoveAllListeners();
+        Message.Msg.IsLock = false;
+        state = null;
+        combat_exit.SetActive(false);
+        combat_system.SetActive(false);
+        Destroy(round_manager.GetComponent<Combat_System>());
+        Destroy(round_manager.GetComponent<TurnManager>());
+        Destroy(round_manager.GetComponent<Extra_Select_Manager>());
+        //Destroy(Message.Msg.Enemy);
+        Message.Msg.Enemy = null;
     }
     void Combat_Load()
     {
+        if (Message.Msg.enemy_in_instances.Count == 0) Debug.Log("No Enemy");
+        AudioClip newClip = Resources.Load<AudioClip>("Music/" + manager.Get_Enemy_Data(Message.Msg.enemy_in_instances[0]).enemy_music);
+        MusicController.Instance.ChangeBackgroundMusic(newClip);
         cover_box.SetActive(true);
         round_manager.AddComponent<Combat_System>();
         round_manager.AddComponent<TurnManager>();
@@ -117,20 +163,28 @@ public class Btn_Controller : MonoBehaviour
             Exit_Rule();
         });
     }
+    //回到游戏界面
     public void Combat_Back()
     {
+        MusicEvent.Instance.ClickEventMusic();
         combat_exit.SetActive(false);
     }
+    //打开规则界面
     void Show_Rules()
     {
+        MusicEvent.Instance.ClickEventMusic();
         rule_box.SetActive(true);
     }
+    //关闭规则界面
     void Exit_Rule()
     {
+        MusicEvent.Instance.ClickEventMusic();
         rule_box.SetActive(false);
     }
+    //取消选择
     public void End_Select()
     {
+        MusicEvent.Instance.ClickEventMusic();
         skill.Get_skills(Round_Message.RMsg.select_action[0] + "_plus", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
         Return_Select();
     }

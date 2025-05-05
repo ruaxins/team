@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UI;
 
 // 声明带参数的委托类型
 public delegate void ParameterDelegate(string message);
@@ -50,6 +51,7 @@ public class TurnManager : MonoBehaviour
     private void StartPlayerTurn()
     {
         screen.SetActive(false);
+        GameObject.Find("Fight").GetComponent<Button>().enabled = true;
         // 玩家回合开始逻辑
         Debug.Log("玩家回合开始");
         //回合开始触发

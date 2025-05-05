@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - ground
+  - Shop
+  - Normal
+  - Warp
+  - Start
   layers:
   - Default
   - TransparentFX
