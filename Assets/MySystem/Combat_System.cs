@@ -20,27 +20,29 @@ public class Combat_System : MonoBehaviour
     #region 初始化组件
     List<Vector2> potision = new List<Vector2>
     {
-        new Vector2(0, 0),
-        new Vector2(150, 0),
-        new Vector2(-150, 0),
-        new Vector2(300, 0),
-        new Vector2(-300, 0),
-        new Vector2(450, 0),
-        new Vector2(-450, 0),
-        new Vector2(600, 0),
-        new Vector2(-600, 0),
-        new Vector2(750, 0),
-        new Vector2(-750, 0),
-        new Vector2(900, 0),
-        new Vector2(-900, 0),
+        //14
+        new Vector2(-975, 0),
+        new Vector2(-825, 0),
+        new Vector2(-675, 0),
+        new Vector2(-525, 0),
+        new Vector2(-375, 0),
+        new Vector2(-225, 0),
+        new Vector2(-75, 0),
+        new Vector2(75, 0),
+        new Vector2(225, 0),
+        new Vector2(375, 0),
+        new Vector2(525, 0),
+        new Vector2(675, 0),
+        new Vector2(825, 0),
+        new Vector2(975, 0),
     };
     List<Vector2> potision_enemy = new List<Vector2>
     {
+        new Vector2(-900, 0),
+        new Vector2(-450, 0),
         new Vector2(0, 0),
         new Vector2(450, 0),
-        new Vector2(-450, 0),
         new Vector2(900, 0),
-        new Vector2(-900, 0),
     };
     Skills skill = new Skills();
     Manager manager = new Manager();
@@ -86,6 +88,11 @@ public class Combat_System : MonoBehaviour
     }
     public void Flash_pos()
     {
+        //手牌
+        Round_Message.RMsg.hand_in_instances = SortCard.SortBySuit(Round_Message.RMsg.hand_in_instances);
+        int index = potision.Count - Round_Message.RMsg.hand_in_instances.Count;
+        if (index % 2 == 0) hand_in_list.transform.localPosition = new Vector2(0, 0);
+        else hand_in_list.transform.localPosition = new Vector2(75,0);
         foreach (string type in Round_Message.RMsg.hand_in_instances)
         {
             GameObject instance = manager.Get_Card_Instances(type);
@@ -96,12 +103,17 @@ public class Combat_System : MonoBehaviour
             RectTransform rt = instance.GetComponent<RectTransform>();
             // 设置位置（中心点坐标）
             int pos = Round_Message.RMsg.hand_in_instances.IndexOf(type);
-            rt.anchoredPosition = potision[pos]; 
+            rt.anchoredPosition = potision[index/2+pos]; 
 
             instance.transform.localScale = new Vector2(1, 1);
             instance.GetComponent<CardHoverEffect>().originalPosition = instance.transform.position;
             instance.GetComponent<CardHoverEffect>().originalScale = new Vector2(1, 1);
         }
+        //装备
+        Round_Message.RMsg.equipment_instances = SortCard.SortBySuit(Round_Message.RMsg.equipment_instances);
+        int index_1 = potision.Count - Round_Message.RMsg.equipment_instances.Count;
+        if (index_1 % 2 == 0) equipement_list.transform.localPosition = new Vector2(0, 0);
+        else equipement_list.transform.localPosition = new Vector2(75, 0);
         foreach (string type in Round_Message.RMsg.equipment_instances)
         {
             GameObject instance = manager.Get_Card_Instances(type);
@@ -112,8 +124,12 @@ public class Combat_System : MonoBehaviour
             RectTransform rt = instance.GetComponent<RectTransform>();
             // 设置位置（中心点坐标）
             int pos = Round_Message.RMsg.equipment_instances.IndexOf(type);
-            rt.anchoredPosition = potision[pos];
+            rt.anchoredPosition = potision[index_1/2+pos];
         }
+        //敌人
+        int index_2 = potision_enemy.Count - Round_Message.RMsg.enemy_instances.Count;
+        if (index_2 % 2 == 0) enemy_list.transform.localPosition = new Vector2(0, 0);
+        else enemy_list.transform.localPosition = new Vector2(-250, 0);
         foreach (string type in Round_Message.RMsg.enemy_instances)
         {
             GameObject instance = manager.Get_Enemy_Instances(type);
@@ -124,7 +140,7 @@ public class Combat_System : MonoBehaviour
             RectTransform rt = instance.GetComponent<RectTransform>();
             // 设置位置（中心点坐标）
             int pos = Round_Message.RMsg.enemy_instances.IndexOf(type);
-            rt.anchoredPosition = potision_enemy[pos];
+            rt.anchoredPosition = potision_enemy[index_2/2+pos];
 
             Transform name = instance.transform.Find("Name");
             Transform health = instance.transform.Find("Health");
@@ -190,13 +206,13 @@ public class Combat_System : MonoBehaviour
         {
             Debug.Log("Win");
             //退出战斗
-            GameObject.Find("Manager").GetComponent<Btn_Controller>().WinGame();
+            GameObject.Find("Manager").GetComponent<Btn_Controller>().End_Open(true);
         }
         else if (Round_Message.RMsg.Player.player_health <= 0)
         {
             Debug.Log("Loss");
             //退出战斗
-            GameObject.Find("Manager").GetComponent<Btn_Controller>().LossGame();
+            GameObject.Find("Manager").GetComponent<Btn_Controller>().End_Open(false);
         }
     }
     #region 外部调用方法

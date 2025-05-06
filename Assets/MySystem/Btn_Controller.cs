@@ -18,6 +18,7 @@ public class Btn_Controller : MonoBehaviour
     public GameObject equip_box;
     public GameObject equiped;
     public GameObject unequiped;
+    public GameObject end_box;
     public Button select_return;
     public Button select_end;
     public Button drop;
@@ -30,10 +31,13 @@ public class Btn_Controller : MonoBehaviour
     public Button equip_exit;
     public Button page_down;
     public Button page_up;
+    public Button end_exit;
     public Text shop_text;
     public Text money;
     public Text page;
+    public Text end_text;
     string state = null;
+    bool iswin;
 
     List<Vector2> potision = new List<Vector2>
     {
@@ -222,6 +226,31 @@ public class Btn_Controller : MonoBehaviour
         Destroy(round_manager.GetComponent<Extra_Select_Manager>());
         //Destroy(Message.Msg.Enemy);
         Message.Msg.Enemy = null;
+    }
+    public void End_Open(bool iswin)
+    {
+        end_box.SetActive(true);
+        this.iswin = iswin;
+        if (iswin)
+        {
+            end_text.text = "W I N";
+        }
+        else
+        {
+            end_text.text = "L O S S";
+        }
+    }
+    public void End_Exit()
+    {
+        end_box.SetActive(false);
+        if (iswin)
+        {
+            WinGame();
+        }
+        else
+        {
+            LossGame();
+        }
     }
     public void WinGame()
     {

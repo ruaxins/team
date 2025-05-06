@@ -89,7 +89,8 @@
     <Compile Include="Assets\Ciconia Studio\_Shared Files\Scripts\Demo\SuperCamera.cs" />
     <Compile Include="Assets\c#\card.cs" />
     <Compile Include="Assets\MySystem\MusicController.cs" />
-    <Compile Include="Assets\MySystem\Start.cs" />
+    <Compile Include="Assets\MySystem\Enemy_LookAt.cs" />
+    <Compile Include="Assets\MySystem\SortCard.cs" />
     <Compile Include="Assets\MySystem\Buy.cs" />
     <Compile Include="Assets\c#\cardsee.cs" />
     <Compile Include="Assets\Ciconia Studio\_Shared Files\Scripts\Demo\FreeCamera.cs" />

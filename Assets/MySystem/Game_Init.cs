@@ -422,6 +422,12 @@ public class Game_Init : MonoBehaviour
     }
     void Register_Enemy_Object(string type, GameObject obj, Enemy enemy)
     {
+        string path = "Enemy/" + enemy.enemy_type;
+        Image image = obj.GetComponent<Image>();
+        Sprite sprite = Resources.Load<Sprite>(path);
+        if (sprite != null) image.sprite = sprite;
+        else Debug.Log("can not find sprite:" + path);
+
         if (!Message.Msg.instance_enemy.ContainsKey(type))
         {
             Message.Msg.instance_enemy.Add(type, obj);
