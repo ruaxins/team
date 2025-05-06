@@ -24,6 +24,9 @@ dist/
 *.a
 *.lib
 *.out
+*.csproj
+*.sln
+
 
 # 忽略 Unity 生成的文件
 /[Ll]ibrary/
