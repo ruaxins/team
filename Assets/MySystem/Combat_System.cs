@@ -206,13 +206,13 @@ public class Combat_System : MonoBehaviour
         {
             Debug.Log("Win");
             //退出战斗
-            GameObject.Find("Manager").GetComponent<Btn_Controller>().WinGame();
+            GameObject.Find("Manager").GetComponent<Btn_Controller>().End_Open(true);
         }
         else if (Round_Message.RMsg.Player.player_health <= 0)
         {
             Debug.Log("Loss");
             //退出战斗
-            GameObject.Find("Manager").GetComponent<Btn_Controller>().LossGame();
+            GameObject.Find("Manager").GetComponent<Btn_Controller>().End_Open(false);
         }
     }
     #region 外部调用方法
