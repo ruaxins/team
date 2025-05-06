@@ -47,46 +47,33 @@ public class Bank_Manager : MonoBehaviour
         Get_Card("spadeA");
 
         Get_Equipement("club3");
-        //Get_Equipement("club4");
-        //Get_Equipement("club5");
-        //Get_Equipement("club6");
-        //Get_Equipement("club7");
-        //Get_Equipement("club8");
-        //Get_Equipement("club9");
-        //Get_Equipement("club10");
-        //Get_Equipement("clubJ");
-        //Get_Equipement("clubQ");
-        //Get_Equipement("clubK");
-        //Get_Equipement("clubA");
+        Get_Equipement("club4");
+        Get_Equipement("club5");
+        Get_Equipement("club6");
+        Get_Equipement("club7");
+        Get_Equipement("club8");
+        Get_Equipement("club9");
+        Get_Equipement("club10");
+        Get_Equipement("clubJ");
+        Get_Equipement("clubQ");
+        Get_Equipement("clubK");
+        Get_Equipement("clubA");
 
-        Get_Equipement("curse1");
+        //Get_Equipement("curse1");
         //Get_Equipement("curse2");
         //Get_Equipement("curse3");
         //Get_Equipement("curse4");
         //Get_Equipement("curse5");
-
-        //Get_Enemy("fire_ghost");
-        //Get_Enemy("fire_insect");
-        //Get_Enemy("fire_slime");
-        //Get_Enemy("fire_puppet");
-        //Get_Enemy("fire_specter");
-        //Get_Enemy("fire_dog");
-        //Get_Enemy("fire_knight");
-        //Get_Enemy("fire_monster");
-        //Get_Enemy("fire_witch");
-        //Get_Enemy("fire_king");
     }
 
     void Get_Card(string type)
     {
         manager.Get_Card_Outside(type);
     }
-    void Get_Enemy(string type)
-    {
-        manager.Get_Enemy_Outside(type);
-    }
     void Get_Equipement(string type)
     {
-        manager.Get_Equipement_Outside(type);
+        if (Message.Msg.card_bank.Count <= 0) return;
+        if (Message.Msg.shop_instances.Contains(type)) return;
+        Message.Msg.shop_instances.Add(type);
     }
 }

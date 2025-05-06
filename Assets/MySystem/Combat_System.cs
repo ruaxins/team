@@ -71,7 +71,7 @@ public class Combat_System : MonoBehaviour
         {
             Round_Message.RMsg.bank_in_instances.Add(card);
         }
-        foreach (string card in Message.Msg.equipement_instance)
+        foreach (string card in Message.Msg.equip_instances)
         {
             Round_Message.RMsg.equipment_instances.Add(card);
         }

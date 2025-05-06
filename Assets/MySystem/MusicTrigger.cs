@@ -11,8 +11,6 @@ public class MusicTrigger : MonoBehaviour
         music.Add("Start", clip);
         clip = Resources.Load<AudioClip>("Music/Normal");
         music.Add("Normal", clip);
-        clip = Resources.Load<AudioClip>("Music/Shop");
-        music.Add("Shop", clip);
         clip = Resources.Load<AudioClip>("Music/Warp");
         music.Add("Warp", clip);
     }

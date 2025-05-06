@@ -28,9 +28,6 @@ public class CardHoverEffect : MonoBehaviour,IPointerEnterHandler,IPointerExitHa
         // 动画效果
         transform.DOScale(originalScale * hoverScale, animDuration).SetEase(easeType);
         transform.DOMoveY(originalPosition.y + hoverHeight, animDuration).SetEase(easeType);
-
-        // 可选：播放音效
-        MusicEvent.Instance.ShuffleEventMusic();
     }
     public void OnPointerExit(PointerEventData eventData)
     {

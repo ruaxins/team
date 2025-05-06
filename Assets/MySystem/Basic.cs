@@ -11,6 +11,7 @@ public class Basic : MonoBehaviour
 public class Card
 {
     //卡牌属性
+    public int price = 20;
     public string type;//diamond-方块，spade-黑桃，club-梅花，heart-红桃
     public string point_show;//展示的点数3-10,JQKA
     public float point;//计算的点数
@@ -333,7 +334,8 @@ public class Skills
     public void ClubA_plus(Player player, Enemy enemy)
     {
         //回合开始调用
-        Round_Message.RMsg.bank_in_instances.Add(Round_Message.RMsg.Card_Now);
+        //待完善
+        //Round_Message.RMsg.bank_in_instances.Add(Round_Message.RMsg.Card_Now);
         manager.Get_card();
     }
     #endregion
@@ -546,6 +548,40 @@ public class Manager
         }
         return false;
     }
+    //单击装备
+    public void OnEquipClick(string type)
+    {
+        MusicEvent.Instance.ClickEventMusic();
+        GameObject card = Get_Equip_Instance(type);
+        if (Message.Msg.equip_instances.Contains(type))
+        {
+            Message.Msg.Equip_Num--;
+            UnSelect_equip(type);
+            return;
+        }
+        if (Message.Msg.equipement_instance.Contains(type))
+        {
+            if (Message.Msg.Equip_Num >= Message.Msg.Equip_Num_Max) return;
+            Message.Msg.Equip_Num++;
+            Select_equip(type);
+            return;
+        }
+        Debug.Log("can not found equip");
+    }
+    //选中装备
+    public void Select_equip(string type)
+    {
+        Message.Msg.equip_instances.Add(type);
+        Message.Msg.equipement_instance.Remove(type);
+        GameObject.Find("Manager").GetComponent<Btn_Controller>().Flash_Pos_Equip();
+    }
+    //取消选择装备
+    public void UnSelect_equip(string type)
+    {
+        Message.Msg.equipement_instance.Add(type);
+        Message.Msg.equip_instances.Remove(type);
+        GameObject.Find("Manager").GetComponent<Btn_Controller>().Flash_Pos_Equip();
+    }
     //单击卡牌
     public void OnCardClick(string type)
     {
@@ -603,6 +639,24 @@ public class Manager
         Round_Message.RMsg.hand_in_instances.Add(type);
         Round_Message.RMsg.hand_out_instances.Remove(type);
         Round_Message.RMsg.skill_action.Remove(type);
+    }
+    //获取装备实例
+    public GameObject Get_Equip_Instance(string type)
+    {
+        if (Message.Msg.instance_equip.TryGetValue(type, out GameObject card))
+        {
+            return card;
+        }
+        return null;
+    }
+    //获取商店实例
+    public GameObject Get_Shop_Instance(string type)
+    {
+        if (Message.Msg.instance_shop.TryGetValue(type, out GameObject card))
+        {
+            return card;
+        }
+        return null;
     }
     //获取选择实例
     public GameObject Get_Select_Instance(string type)
@@ -830,8 +884,7 @@ public class Manager
     {
         if (Message.Msg.card_bank.Count <= 0) return;
         if (Message.Msg.equipement_instance.Contains(type)) return;
-        if (Get_Card_Data(type).type == "club") Message.Msg.equipement_instance.Add(type);
-        if (Get_Card_Data(type).type == "curse") Message.Msg.equipement_instance.Insert(0, type);
+        Message.Msg.equipement_instance.Add(type);
     }    
     //在场景中移除敌人
     public void Remove_Enemy_Outside(string type)
@@ -1024,5 +1077,9 @@ public class Manager
             }
         } 
     }
-
+    //获得金币
+    public void Get_Money(int num)
+    {
+        Message.Msg.Money += num;
+    }
 }

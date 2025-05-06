@@ -290,6 +290,80 @@ public class Game_Init : MonoBehaviour
         Register_Select_Object("heartA", Select_Create());
 
         #endregion
+        #region ÉÌµê¿¨ÅÆÊµÀýÈë¿â
+        //¹¥»÷¿¨
+        Register_Shop_Object("diamond3", Shop_Create());
+        Register_Shop_Object("diamond4", Shop_Create());
+        Register_Shop_Object("diamond5", Shop_Create());
+        Register_Shop_Object("diamond6", Shop_Create());
+        Register_Shop_Object("diamond7", Shop_Create());
+        Register_Shop_Object("diamond8", Shop_Create());
+        Register_Shop_Object("diamond9", Shop_Create());
+        Register_Shop_Object("diamond10", Shop_Create());
+        Register_Shop_Object("diamondJ", Shop_Create());
+        Register_Shop_Object("diamondQ", Shop_Create());
+        Register_Shop_Object("diamondK", Shop_Create());
+        Register_Shop_Object("diamondA", Shop_Create());
+        //·ÀÓù¿¨
+        Register_Shop_Object("spade3", Shop_Create());
+        Register_Shop_Object("spade4", Shop_Create());
+        Register_Shop_Object("spade5", Shop_Create());
+        Register_Shop_Object("spade6", Shop_Create());
+        Register_Shop_Object("spade7", Shop_Create());
+        Register_Shop_Object("spade8", Shop_Create());
+        Register_Shop_Object("spade9", Shop_Create());
+        Register_Shop_Object("spade10", Shop_Create());
+        Register_Shop_Object("spadeJ", Shop_Create());
+        Register_Shop_Object("spadeQ", Shop_Create());
+        Register_Shop_Object("spadeK", Shop_Create());
+        Register_Shop_Object("spadeA", Shop_Create());
+        //×°±¸¿¨
+        Register_Shop_Object("club3", Shop_Create());
+        Register_Shop_Object("club4", Shop_Create());
+        Register_Shop_Object("club5", Shop_Create());
+        Register_Shop_Object("club6", Shop_Create());
+        Register_Shop_Object("club7", Shop_Create());
+        Register_Shop_Object("club8", Shop_Create());
+        Register_Shop_Object("club9", Shop_Create());
+        Register_Shop_Object("club10", Shop_Create());
+        Register_Shop_Object("clubJ", Shop_Create());
+        Register_Shop_Object("clubQ", Shop_Create());
+        Register_Shop_Object("clubK", Shop_Create());
+        Register_Shop_Object("clubA", Shop_Create());
+        //×çÖä¿¨
+        Register_Shop_Object("curse1", Shop_Create());
+        Register_Shop_Object("curse2", Shop_Create());
+        Register_Shop_Object("curse3", Shop_Create());
+        Register_Shop_Object("curse4", Shop_Create());
+        Register_Shop_Object("curse5", Shop_Create());
+        //¼¼ÄÜ¿¨
+        Register_Shop_Object("heart3", Shop_Create());
+        Register_Shop_Object("heart4", Shop_Create());
+        Register_Shop_Object("heart5", Shop_Create());
+        Register_Shop_Object("heart6", Shop_Create());
+        Register_Shop_Object("heart7", Shop_Create());
+        Register_Shop_Object("heart8", Shop_Create());
+        Register_Shop_Object("heart9", Shop_Create());
+        Register_Shop_Object("heart10", Shop_Create());
+        Register_Shop_Object("heartJ", Shop_Create());
+        Register_Shop_Object("heartQ", Shop_Create());
+        Register_Shop_Object("heartK", Shop_Create());
+        Register_Shop_Object("heartA", Shop_Create());
+        #endregion
+        #region ×°±¸¿¨ÅÆÊµÀýÈë¿â
+        Register_Equip_Object("club3", Card_Create());
+        Register_Equip_Object("club4", Card_Create());
+        Register_Equip_Object("club5", Card_Create());
+        Register_Equip_Object("club6", Card_Create());
+        Register_Equip_Object("club7", Card_Create());
+        Register_Equip_Object("club8", Card_Create());
+        Register_Equip_Object("club9", Card_Create());
+        Register_Equip_Object("club10", Card_Create());
+        Register_Equip_Object("clubJ", Card_Create());
+        Register_Equip_Object("clubQ", Card_Create());
+        Register_Equip_Object("clubK", Card_Create());
+        Register_Equip_Object("clubA", Card_Create());
+        #endregion
     }
     GameObject Card_Create()
     {
@@ -307,7 +381,14 @@ public class Game_Init : MonoBehaviour
     }
     GameObject Select_Create()
     {
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/select");
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/card");
+        GameObject select = Instantiate(prefab, transform);
+        select.SetActive(false);
+        return select;
+    }
+    GameObject Shop_Create()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/shop");
         GameObject select = Instantiate(prefab, transform);
         select.SetActive(false);
         return select;
@@ -356,6 +437,12 @@ public class Game_Init : MonoBehaviour
     }
     void Register_Select_Object(string type, GameObject obj)
     {
+        string path = "Card/" + manager.Get_Card_Data(type).type + "/" + manager.Get_Card_Data(type).point_show;
+        Image image = obj.GetComponent<Image>();
+        Sprite sprite = Resources.Load<Sprite>(path);
+        if (sprite != null) image.sprite = sprite;
+        else Debug.Log("can not find sprite:" + path);
+
         if (!Message.Msg.instance_select.ContainsKey(type))
         {
             Message.Msg.instance_select.Add(type, obj);
@@ -364,5 +451,38 @@ public class Game_Init : MonoBehaviour
         {
             manager.Get_Now_Card(obj);
         });
+        obj.AddComponent<InfoManager>();
+    }
+    void Register_Shop_Object(string type, GameObject obj)
+    {
+        string path = "Card/" + manager.Get_Card_Data(type).type + "/" + manager.Get_Card_Data(type).point_show;
+        Image image = obj.GetComponent<Image>();
+        Sprite sprite = Resources.Load<Sprite>(path);
+        if (sprite != null) image.sprite = sprite;
+        else Debug.Log("can not find sprite:" + path);
+
+        if (!Message.Msg.instance_shop.ContainsKey(type))
+        {
+            Message.Msg.instance_shop.Add(type, obj);
+        }
+        obj.AddComponent<InfoManager>();
+    }
+    void Register_Equip_Object(string type, GameObject obj)
+    {
+        string path = "Card/" + manager.Get_Card_Data(type).type + "/" + manager.Get_Card_Data(type).point_show;
+        Image image = obj.GetComponent<Image>();
+        Sprite sprite = Resources.Load<Sprite>(path);
+        if (sprite != null) image.sprite = sprite;
+        else Debug.Log("can not find sprite:" + path);
+
+        if (!Message.Msg.instance_equip.ContainsKey(type))
+        {
+            Message.Msg.instance_equip.Add(type, obj);
+        }
+        obj.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            manager.OnEquipClick(type);
+        });
+        obj.AddComponent<InfoManager>();
     }
 }

@@ -12,13 +12,52 @@ public class Btn_Controller : MonoBehaviour
     public GameObject rule_box;
     public GameObject select_box;
     public GameObject cover_box;
+    public GameObject shop;
+    public GameObject shop_list;
+    public GameObject shop_box;
+    public GameObject equip_box;
+    public GameObject equiped;
+    public GameObject unequiped;
     public Button select_return;
     public Button select_end;
     public Button drop;
     public Button fight;
     public Button rules;
     public Button rule_exit;
+    public Button shop_exit;
+    public Button shop_cancel;
+    public Button shop_confirm;
+    public Button equip_exit;
+    public Button page_down;
+    public Button page_up;
+    public Text shop_text;
+    public Text money;
+    public Text page;
     string state = null;
+
+    List<Vector2> potision = new List<Vector2>
+    {
+        new Vector2(-650, 180),
+        new Vector2(-400, 180),
+        new Vector2(-150, 180),
+        new Vector2(100, 180),
+        new Vector2(350, 180),
+        new Vector2(600, 180),
+        new Vector2(-650, -180),
+        new Vector2(-400, -180),
+        new Vector2(-150, -180),
+        new Vector2(100, -180),
+        new Vector2(350, -180),
+        new Vector2(600, -180),
+    };
+    List<Vector2> potision_equip = new List<Vector2>
+    {        
+        new Vector2(-200, 0),
+        new Vector2(0, 0),
+        new Vector2(200, 0),
+        new Vector2(-400, 0),
+        new Vector2(400, 0),
+    };
 
     Manager manager = new Manager();
     Skills skill = new Skills();
@@ -27,16 +66,18 @@ public class Btn_Controller : MonoBehaviour
         if (round_manager == null)
         {
             round_manager = GameObject.Find("RoundManager");
-            // 或者 GetComponent 也可以，看你的设计
         }
     }
     void Update()
     {
+        money.text = "金币：" + Message.Msg.Money;
         if (Message.Msg.Enable_e && Input .GetKeyDown(KeyCode.E))
         {
             Message.Msg.IsLock = true;
-            state = "interaction";
+            state = "shop";
             Message.Msg.Enable_e = false;
+
+            Shop_Load();
         }
         if (Message.Msg.Enable_x && Input .GetKeyDown(KeyCode.X))
         {
@@ -47,18 +88,115 @@ public class Btn_Controller : MonoBehaviour
 
             Combat_Load();
         }
+        if (Message.Msg.Enable_Tab && Input.GetKeyDown(KeyCode.Tab))
+        {
+            Message.Msg.IsLock = true;
+            state = "equip";
+            Message.Msg.Enable_Tab = false;
+
+            Equip_Load();
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             switch (state)
             {
-                //case null: state = "settings"; settings.SetActive(true); break;
-                //case "settings": state = null; settings.SetActive(false); break;
                 case "combat": combat_exit.SetActive(true); Message.Msg.IsLock = false; break;
                 default:
                     break;
             }
             Message.Msg.IsLock = !Message.Msg.IsLock;
         }
+    }
+    public void Flash_Pos()
+    {
+        foreach (string type in Message.Msg.shop_instances)
+        {
+            GameObject instance = manager.Get_Shop_Instance(type);
+            instance.SetActive(true);
+            // 设置父对象
+            instance.transform.SetParent(shop_list.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
+            // 设置位置（中心点坐标）
+            int pos = Message.Msg.shop_instances.IndexOf(type);
+            rt.anchoredPosition = potision[pos];
+        }
+    }
+    public void Flash_Pos_Equip()
+    {
+        foreach (string type in Message.Msg.equip_instances)
+        {
+            Debug.Log("equiped"+type);
+            GameObject instance = manager.Get_Equip_Instance(type);
+            instance.SetActive(true);
+            // 设置父对象
+            instance.transform.SetParent(equiped.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
+            // 设置位置（中心点坐标）
+            int pos = Message.Msg.equip_instances.IndexOf(type);
+            rt.anchoredPosition = potision_equip[pos];
+        }
+        foreach (string type in Message.Msg.equipement_instance)
+        {
+            Debug.Log("unequiped" + type);
+            GameObject instance = manager.Get_Equip_Instance(type);
+            instance.SetActive(true);
+            // 设置父对象
+            instance.transform.SetParent(unequiped.transform, false);
+            // 获取RectTransform
+            RectTransform rt = instance.GetComponent<RectTransform>();
+            // 设置位置（中心点坐标）
+            int pos = Message.Msg.equipement_instance.IndexOf(type);
+            rt.anchoredPosition = potision[pos];
+        }
+    }
+    public void Equip_Load()
+    {
+        equip_box.SetActive(true);
+        Flash_Pos_Equip();
+    }
+    public void Equip_Exit()
+    {
+        equip_box.SetActive(false);
+        Message.Msg.Enable_Tab = true;
+        Message.Msg.IsLock = false;
+    }
+    public void Shop_Load()
+    {
+        shop.SetActive(true);
+        AudioClip newClip = Resources.Load<AudioClip>("Music/Shop");
+        MusicController.Instance.ChangeBackgroundMusic(newClip);
+
+        if (Message.Msg.shop_instances.Count <= 0)
+        {
+            Debug.Log("无卡牌在售");
+            return;
+        }
+        Flash_Pos();
+    }
+    public void Shop_Exit()
+    {        
+        shop.SetActive(false);
+        MusicController.Instance.ChangeBackgroundMusic(Message.Msg.backclip);
+        Message.Msg.Enable_e = true;
+        Message.Msg.IsLock = false;
+    }
+    public void Shop_Cancel()
+    {
+        shop_box.SetActive(false);
+    }
+    public void Shop_Confirm()
+    {        
+        shop_box.SetActive(false);
+        if (Message.Msg.Money < manager.Get_Card_Data(Message.Msg.Buy_Card).price) return;
+        //买
+        Message.Msg.Money -= manager.Get_Card_Data(Message.Msg.Buy_Card).price;
+        Message.Msg.shop_instances.Remove(Message.Msg.Buy_Card);
+        manager.Get_Equipement_Outside(Message.Msg.Buy_Card);
+        manager.Get_Shop_Instance(Message.Msg.Buy_Card).SetActive(false);
+        Message.Msg.Buy_Card = null;
+        Flash_Pos();
     }
     public void Combat_Exit()
     {
@@ -162,6 +300,14 @@ public class Btn_Controller : MonoBehaviour
         {
             Exit_Rule();
         });
+        page_down.onClick.AddListener(() =>
+        {
+            round_manager.GetComponent<Extra_Select_Manager>().Page_Down();
+        });
+        page_up.onClick.AddListener(() =>
+        {
+            round_manager.GetComponent<Extra_Select_Manager>().Page_Up();
+        });
     }
     //回到游戏界面
     public void Combat_Back()
@@ -188,6 +334,7 @@ public class Btn_Controller : MonoBehaviour
         skill.Get_skills(Round_Message.RMsg.select_action[0] + "_plus", Round_Message.RMsg.Player, Round_Message.RMsg.Enemy_Now);
         Return_Select();
     }
+    //确认选择
     public void Return_Select()
     {
         foreach (string type in Message.Msg.bank_in_instances)

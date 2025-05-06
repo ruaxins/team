@@ -33,7 +33,8 @@ public class InfoManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         // 显示信息面板
         infoBox.SetActive(true);
         descriptionText.text = GetCardDescription(); // 自定义方法获取卡牌描述
-
+        // 播放音效
+        MusicEvent.Instance.ShuffleEventMusic();
     }
     public void OnPointerExit(PointerEventData eventData)
     {
@@ -43,8 +44,25 @@ public class InfoManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
     string GetCardDescription()
     {
+        Dictionary<string, GameObject> cards = new Dictionary<string, GameObject>();
         infoBox_plus.SetActive(true);
-        foreach (var type in Message.Msg.instance_card)
+        if(Message.Msg.instance_card.ContainsValue(gameObject))
+        {
+            cards = Message.Msg.instance_card;
+        }
+        else if(Message.Msg.instance_select.ContainsValue(gameObject))
+        {
+            cards = Message.Msg.instance_select;
+        }
+        else if (Message.Msg.instance_shop.ContainsValue(gameObject))
+        {
+            cards = Message.Msg.instance_shop;
+        }
+        else if (Message.Msg.instance_equip.ContainsValue(gameObject))
+        {
+            cards = Message.Msg.instance_equip;
+        }
+        foreach (var type in cards)
         {
             if (type.Value == gameObject)
             {
@@ -66,6 +84,7 @@ public class InfoManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 return manager.Get_Card_Data(type.Key).skill_message;
             }
         }
+
         return "No Message";
     }
 }
