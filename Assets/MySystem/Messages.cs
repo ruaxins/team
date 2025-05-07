@@ -32,8 +32,10 @@ public class Message
     bool enable_x = false;
     public bool Enable_x { get => enable_x; set => enable_x = value; }
 
-    bool enable_e = true;
+    bool enable_e = false;
     public bool Enable_e { get => enable_e; set => enable_e = value; }
+    bool enable_talk = false;
+    public bool Enable_Talk { get => enable_talk; set => enable_talk = value; }
     bool enable_tab = true;
     public bool Enable_Tab { get => enable_tab; set => enable_tab = value; }
     //场景内敌人实例
@@ -41,7 +43,7 @@ public class Message
     //背景音乐
     public AudioClip backclip = null;
     //金钱
-    private int money = 100;
+    private int money = 0;
     public int Money { get => money; set => money = value; }
 
     //购买的卡牌

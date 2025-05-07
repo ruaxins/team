@@ -28,6 +28,8 @@ public class TurnManager : MonoBehaviour
         screen = GameObject.Find("Enemy_Round");
         CurrentPhase = TurnPhase.PlayerTurn;
         StartPlayerTurn();
+        Round_Message.RMsg.hand_in_instances = SortCard.SortBySuit(Round_Message.RMsg.hand_in_instances);
+        GameObject.Find("RoundManager").GetComponent<Combat_System>().Flash_hand_in();
     }
     //怪物回合
     public void EndPlayerTurn()
@@ -50,6 +52,7 @@ public class TurnManager : MonoBehaviour
 
     private void StartPlayerTurn()
     {
+        GameObject.Find("Manager").GetComponent<Btn_Controller>().Change_Turn(true);
         screen.SetActive(false);
         GameObject.Find("Fight").GetComponent<Button>().enabled = true;
         // 玩家回合开始逻辑
@@ -80,6 +83,7 @@ public class TurnManager : MonoBehaviour
     }
     private void StartEnemyTurn()
     {
+        GameObject.Find("Manager").GetComponent<Btn_Controller>().Change_Turn(false);
         screen.SetActive(true);
         // 怪物回合开始逻辑
         Debug.Log("怪物回合开始");

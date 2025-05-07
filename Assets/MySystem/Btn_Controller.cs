@@ -19,6 +19,10 @@ public class Btn_Controller : MonoBehaviour
     public GameObject equiped;
     public GameObject unequiped;
     public GameObject end_box;
+    public GameObject player_turn;
+    public GameObject enemy_turn;
+    public GameObject now_turn;
+    public GameObject rule_out_box;
     public Button select_return;
     public Button select_end;
     public Button drop;
@@ -32,12 +36,16 @@ public class Btn_Controller : MonoBehaviour
     public Button page_down;
     public Button page_up;
     public Button end_exit;
+    public Button flash;
+    public Button rule_out_exit;
     public Text shop_text;
     public Text money;
     public Text page;
     public Text end_text;
     string state = null;
     bool iswin;
+    //false代表按花色，true代表按点数
+    bool isflash = false;
 
     List<Vector2> potision = new List<Vector2>
     {
@@ -82,6 +90,14 @@ public class Btn_Controller : MonoBehaviour
             Message.Msg.Enable_e = false;
 
             Shop_Load();
+        }
+        if (Message.Msg.Enable_Talk && Input.GetKeyDown(KeyCode.E))
+        {
+            Message.Msg.IsLock = true;
+            state = "talk";
+            Message.Msg.Enable_Talk = false;
+
+            Load_Rule_Out();
         }
         if (Message.Msg.Enable_x && Input .GetKeyDown(KeyCode.X))
         {
@@ -183,7 +199,6 @@ public class Btn_Controller : MonoBehaviour
     {        
         shop.SetActive(false);
         MusicController.Instance.ChangeBackgroundMusic(Message.Msg.backclip);
-        Message.Msg.Enable_e = true;
         Message.Msg.IsLock = false;
     }
     public void Shop_Cancel()
@@ -384,5 +399,45 @@ public class Btn_Controller : MonoBehaviour
         {
             GameObject.Find("RoundManager").GetComponent<Combat_System>().Next_round();
         }
+    }
+    //排序手牌
+    public void Sort_Card()
+    {
+        if (isflash)
+        {
+            //按点数
+            Round_Message.RMsg.hand_in_instances = SortCard.SortBySuit(Round_Message.RMsg.hand_in_instances);
+        }
+        else
+        {
+            //按花色
+            Round_Message.RMsg.hand_in_instances = SortCard.SortByRank(Round_Message.RMsg.hand_in_instances);
+        }
+        GameObject.Find("RoundManager").GetComponent<Combat_System>().Flash_hand_in();
+        isflash = !isflash;
+    }
+    //显示当前回合
+    public void Change_Turn(bool isturn)
+    {
+        if (isturn)
+        {
+            //玩家回合
+            now_turn.transform.localPosition = enemy_turn.transform.localPosition;
+        }
+        else
+        {
+            //敌人回合
+            now_turn.transform.localPosition = player_turn.transform.localPosition;
+        }
+    }
+    //显示石碑游戏规则
+    public void Load_Rule_Out()
+    {
+        rule_out_box.SetActive(true);
+    }
+    public void Exit_Rule_Out()
+    {
+        rule_out_box.SetActive(false);
+        Message.Msg.IsLock = false;
     }
 }

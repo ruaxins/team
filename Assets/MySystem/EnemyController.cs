@@ -12,9 +12,13 @@ public class EnemyController : MonoBehaviour
         if (other.tag == "Player")
         {
             manager.Get_Enemy_Outside(enemy);
-            Message.Msg.Enable_x = true;
+            //Message.Msg.Enable_x = true;
             Message.Msg.Enemy = gameObject.transform.parent.gameObject;
         }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.tag == "Player") Message.Msg.Enable_x = true;
     }
     private void OnTriggerExit(Collider other)
     {

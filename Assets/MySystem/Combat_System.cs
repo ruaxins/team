@@ -38,11 +38,11 @@ public class Combat_System : MonoBehaviour
     };
     List<Vector2> potision_enemy = new List<Vector2>
     {
-        new Vector2(-900, 0),
-        new Vector2(-450, 0),
-        new Vector2(0, 0),
-        new Vector2(450, 0),
-        new Vector2(900, 0),
+        new Vector2(-900, -100),
+        new Vector2(-450, -100),
+        new Vector2(0, -100),
+        new Vector2(450, -100),
+        new Vector2(900, -100),
     };
     Skills skill = new Skills();
     Manager manager = new Manager();
@@ -86,13 +86,12 @@ public class Combat_System : MonoBehaviour
         Round_Message.RMsg.Player = new Player(100);
         #endregion
     }
-    public void Flash_pos()
+    public void Flash_hand_in()
     {
         //手牌
-        Round_Message.RMsg.hand_in_instances = SortCard.SortBySuit(Round_Message.RMsg.hand_in_instances);
         int index = potision.Count - Round_Message.RMsg.hand_in_instances.Count;
         if (index % 2 == 0) hand_in_list.transform.localPosition = new Vector2(0, 0);
-        else hand_in_list.transform.localPosition = new Vector2(75,0);
+        else hand_in_list.transform.localPosition = new Vector2(75, 0);
         foreach (string type in Round_Message.RMsg.hand_in_instances)
         {
             GameObject instance = manager.Get_Card_Instances(type);
@@ -103,12 +102,16 @@ public class Combat_System : MonoBehaviour
             RectTransform rt = instance.GetComponent<RectTransform>();
             // 设置位置（中心点坐标）
             int pos = Round_Message.RMsg.hand_in_instances.IndexOf(type);
-            rt.anchoredPosition = potision[index/2+pos]; 
+            rt.anchoredPosition = potision[index / 2 + pos];
 
             instance.transform.localScale = new Vector2(1, 1);
             instance.GetComponent<CardHoverEffect>().originalPosition = instance.transform.position;
             instance.GetComponent<CardHoverEffect>().originalScale = new Vector2(1, 1);
         }
+    }
+    public void Flash_pos()
+    {
+        Flash_hand_in();
         //装备
         Round_Message.RMsg.equipment_instances = SortCard.SortBySuit(Round_Message.RMsg.equipment_instances);
         int index_1 = potision.Count - Round_Message.RMsg.equipment_instances.Count;
@@ -142,33 +145,33 @@ public class Combat_System : MonoBehaviour
             int pos = Round_Message.RMsg.enemy_instances.IndexOf(type);
             rt.anchoredPosition = potision_enemy[index_2/2+pos];
 
-            Transform name = instance.transform.Find("Name");
-            Transform health = instance.transform.Find("Health");
-            Transform attack = instance.transform.Find("Attack");
-            Transform defend = instance.transform.Find("Defend");
+            Transform name = instance.transform.Find("Name").transform.Find("Detial");
+            Transform health = instance.transform.Find("Health").transform.Find("Head").transform.Find("Detial");
+            Transform attack = instance.transform.Find("Attack").transform.Find("Detial");
+            Transform defend = instance.transform.Find("Defend").transform.Find("Detial");
             if (name != null)
             {
                 GameObject childObject = name.gameObject;
                 // 使用子对象...
-                childObject.GetComponent<Text>().text = "名称：" + type;
+                childObject.GetComponent<Text>().text = type;
             }
             if (health != null)
             {
                 GameObject childObject = health.gameObject;
                 // 使用子对象...
-                childObject.GetComponent<Text>().text = "血量：" + manager.Get_Enemy_Data(type).enemy_health.ToString();
+                childObject.GetComponent<Text>().text = manager.Get_Enemy_Data(type).enemy_health.ToString();
             }
             if (attack != null)
             {
                 GameObject childObject = attack.gameObject;
                 // 使用子对象...
-                childObject.GetComponent<Text>().text = "攻击值：" + manager.Get_Enemy_Data(type).enemy_attack_point.ToString();
+                childObject.GetComponent<Text>().text = "攻击值：\n" + manager.Get_Enemy_Data(type).enemy_attack_point.ToString();
             }
             if (defend != null)
             {
                 GameObject childObject = defend.gameObject;
                 // 使用子对象...
-                childObject.GetComponent<Text>().text = "护甲值：" + manager.Get_Enemy_Data(type).enemy_armor_point.ToString();
+                childObject.GetComponent<Text>().text = "护甲值：\n" + manager.Get_Enemy_Data(type).enemy_armor_point.ToString();
             }
         }
     }

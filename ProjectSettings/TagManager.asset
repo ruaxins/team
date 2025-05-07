@@ -9,6 +9,8 @@ TagManager:
   - Normal
   - Warp
   - Start
+  - Stone
+  - Enemy
   layers:
   - Default
   - TransparentFX
