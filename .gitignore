@@ -41,6 +41,9 @@ dist/
 /ProjectSettings/ProjectVersion.txt
 /ProjectSettings/EditorBuildSettings.asset
 
+Assets/changjing.fbm/
+Assets/changj.fbx
+
 
 # 隐私文件
 Assets/StreamingAssets/token.txt
@@ -48,3 +51,7 @@ Assembly-CSharp-Editor.csproj
 Assembly-CSharp-firstpass.csproj
 Assembly-CSharp.csproj
 UserSettings/Layouts/default-2022.dwlt
+<<<<<<< Updated upstream
+=======
+Assembly-CSharp.csproj
+>>>>>>> Stashed changes
